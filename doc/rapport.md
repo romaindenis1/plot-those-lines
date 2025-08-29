@@ -1,6 +1,6 @@
 # Rapport *Plot those dots*
 
-Domaine d'application: 
+Domaine d'application: La NBA
 
 ## a. Introduction
 
