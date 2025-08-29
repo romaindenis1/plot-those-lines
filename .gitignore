@@ -1,1 +1,20 @@
+.vs/
+*.suo
+*.user
+*.vcxproj.user
+*.db
+*.opendb
 
+
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+
+*.csproj.user
+*.csproj.user.json
+*.sln.cache
+*.sln.ide
