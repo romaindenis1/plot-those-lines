@@ -23,7 +23,6 @@
 ## b. Planification
 - Étapes clés du projet
 - Organisation du travail (planning, deadlines)
-- Répartition des rôles et responsabilités
 
 ---
 
