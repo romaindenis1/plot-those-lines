@@ -21,6 +21,7 @@
 ---
 
 ## b. Planification
+- [GitHub Project](https://github.com/users/romaindenis1/projects/5)
 - Étapes clés du projet
 - Organisation du travail (planning, deadlines)
 
