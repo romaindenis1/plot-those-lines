@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using ScottPlot;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,34 +12,93 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CsvHelper;
-using CsvHelper.Configuration;
 namespace Plot_Those_Lines
+/*
+ * Extensions :
+ * CSVReader
+ * Scottplot (Windows Forms)
+*/
 {
     public partial class Form1 : Form
     {
         public Form1()
         {
+            //StreamReader = classe derive de TextReader
+            var reader = new StreamReader("data.csv");
+            try
+            {
                 InitializeComponent();
+
+                //CultureInfo.InvariantCulture pour format universel 
+                var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+                csv.Read();
+                csv.ReadHeader();
+                var headers = csv.HeaderRecord;
+
+                var years = new List<double>();
+                var data = new Dictionary<string, List<double>>();
+
+                foreach (var header in headers.Skip(1)) //premiere collone = Annee donc saute
+                {
+                    //nouvelle liste vide apart la premiere
+                    data[header] = new List<double>();
+                }
+
+                while (csv.Read())
+                {
+                    double yearVal;
+                    if (double.TryParse(csv.GetField(headers[0]), out yearVal))
+                    {
+                        years.Add(yearVal);
+                    }
+                    else
+                    {
+                        //si pas de if else tout pete TODO fix ca
+                        years.Add(double.NaN);
+                    }
+
+                    foreach (var pos in data.Keys.ToList())
+                    {
+                        double val;
+                        if (double.TryParse(csv.GetField(pos), out val))
+                        {
+                            data[pos].Add(val);
+                        }
+                        else
+                        {
+                            data[pos].Add(double.NaN);
+                        }
+                    }
+                }
+
+                //put list onto array
                 double[] dataX = years.ToArray();
 
                 //formsPlot1.Plot.Clear();
 
-                foreach (var kvp in data)
+                foreach (var key in data)
                 {
-                    double[] dataY = kvp.Value.ToArray();
+                    double[] dataY = key.Value.ToArray();
                     var scatter = formsPlot1.Plot.Add.Scatter(dataX, dataY);
-                    scatter.Label = kvp.Key;
+                    
+                    //shows all teams index
+                    scatter.LegendText = key.Key;
                 }
 
-                formsPlot1.Plot.Title("Player Heights by Position Over Years");
+                formsPlot1.Plot.Title("NBA teams wins per year");
                 formsPlot1.Plot.XLabel("Year");
-                formsPlot1.Plot.YLabel("Height");
+                formsPlot1.Plot.YLabel("Wins");
+                /*
+                 * TODO: figure out how to do this
+                 * formsPlot1.Axes.SetLimits(2000, 2025, 0, 82);
+                */
                 formsPlot1.Plot.Legend.IsVisible = true;
 
                 formsPlot1.Refresh();
 
             }
+            //ferme reader de file "bien" sinon gros probleme a prochaine execution
             finally
             {
                 reader.Dispose();
@@ -44,7 +106,6 @@ namespace Plot_Those_Lines
 
 
         }
-
         private void Form1_Load(object sender, EventArgs e)
         {
 

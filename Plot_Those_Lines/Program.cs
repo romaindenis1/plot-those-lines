@@ -17,8 +17,6 @@ namespace Plot_Those_Lines
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
-
-        
         }
     }
 }
