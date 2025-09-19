@@ -36,6 +36,7 @@ namespace Plot_Those_Lines
                 MessageBox.Show("Le fichier data.csv n'existe pas.");
         }
 
+
         private void LoadCsvAndPlot(string path)
         {
             try
