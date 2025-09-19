@@ -113,7 +113,24 @@ namespace Plot_Those_Lines
         private void Form1_Load(object sender, EventArgs e)
         {
             //dont remove future me it will do terrible things c# will not be happy
+        }
 
+        //no i do not know why it is named like that 
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "C:\\";
+                openFileDialog.Filter = "CSV files (*.csv)|*.csv";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedFile = openFileDialog.FileName;
+                    MessageBox.Show("Selected CSV file: " + selectedFile);
+                }
+            }
         }
     }
 }
