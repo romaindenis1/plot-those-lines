@@ -58,6 +58,7 @@ namespace Plot_Those_Lines
                         years.Add(double.NaN);
                     }
 
+                    //puts data into dictionary
                     foreach (var pos in data.Keys.ToList())
                     {
                         double val;
@@ -86,9 +87,12 @@ namespace Plot_Those_Lines
                     scatter.LegendText = key.Key;
                 }
 
+                //TODO: make this be custom title by user input
                 formsPlot1.Plot.Title("NBA teams wins per year");
+                //TODO: make this get data from CSV 
                 formsPlot1.Plot.XLabel("Year");
                 formsPlot1.Plot.YLabel("Wins");
+                
                 /*
                  * TODO: figure out how to do this
                  * formsPlot1.Axes.SetLimits(2000, 2025, 0, 82);
@@ -107,6 +111,7 @@ namespace Plot_Those_Lines
         }
         private void Form1_Load(object sender, EventArgs e)
         {
+            //dont remove future me it will do terrible things c# will not be happy
 
         }
     }
