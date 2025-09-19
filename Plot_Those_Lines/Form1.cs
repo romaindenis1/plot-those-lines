@@ -89,6 +89,7 @@ namespace Plot_Those_Lines
 
                 //TODO: make this be custom title by user input
                 formsPlot1.Plot.Title("NBA teams wins per year");
+
                 //TODO: make this get data from CSV 
                 formsPlot1.Plot.XLabel("Year");
                 formsPlot1.Plot.YLabel("Wins");
