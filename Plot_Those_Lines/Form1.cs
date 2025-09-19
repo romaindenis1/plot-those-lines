@@ -96,7 +96,6 @@ namespace Plot_Those_Lines
                 formsPlot1.Plot.Legend.IsVisible = true;
 
                 formsPlot1.Refresh();
-
             }
             //ferme reader de file "bien" sinon gros probleme a prochaine execution
             finally
