@@ -1,6 +1,8 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using ScottPlot;
+using ScottPlot.Palettes;
+using ScottPlot.PlotStyles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,7 +55,7 @@ namespace Plot_Those_Lines
 
                     var years = new List<double>();
                     var data = new Dictionary<string, List<double>>();
-
+                    
                     foreach (var header in headers.Skip(1)) //premiere collone = Annee donc saute
                     {
                         //nouvelle liste vide apart la premiere
@@ -69,7 +71,6 @@ namespace Plot_Those_Lines
                         }
                         else
                         {
-                            //si pas de if else tout pete TODO fix ca
                             years.Add(double.NaN);
                         }
 
@@ -94,14 +95,23 @@ namespace Plot_Those_Lines
                     //efface le graphe precedent
                     formsPlot1.Plot.Clear();
 
+                    //object de couleur scottplot -- contiend des coleurs tres legeres TODO: FIX
+                    var palette = new Category20();
+
+
+                    formsPlot1.Refresh();
+
+                    //key doit etre = var et donc je dois declarer autre iterator
+                    int i = 0;
                     foreach (var key in data)
                     {
                         double[] dataY = key.Value.ToArray();
                         var scatter = formsPlot1.Plot.Add.Scatter(dataX, dataY);
-                        
-                        //shows all teams index
+
+                        scatter.Color = palette.GetColor(i);
+
+                        // label for legend
                         scatter.LegendText = key.Key;
-                    }
 
                         i++;
                     }
@@ -153,8 +163,8 @@ namespace Plot_Those_Lines
                     //true pour forcer -- windows a des problemes avec la liberte assez souvent
                     File.Copy(selectedFile, csvFilePath, true);
 
-                        //charge et affiche le nouveau fichier CSV
-                        LoadCsvAndPlot(csvFilePath);
+                    //charge et affiche le nouveau fichier CSV
+                    LoadCsvAndPlot(csvFilePath);
                 }
             }
         }
