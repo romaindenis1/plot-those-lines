@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 namespace Plot_Those_Lines
 {
     /*
@@ -127,6 +128,7 @@ namespace Plot_Those_Lines
         private void Form1_Load(object sender, EventArgs e)
         {
             //dont remove future me it will do terrible things c# will not be happy
+            textBox1.Text = "Enter your title here...";
         }
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -150,6 +152,16 @@ namespace Plot_Those_Lines
                 }
             }
         }
-        
+        private void formsPlot1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged_1(object sender, EventArgs e)
+        {
+            string insertedTitle = textBox1.Text;
+            formsPlot1.Plot.Title(insertedTitle);
+            formsPlot1.Refresh();
+        }
     }
 }
