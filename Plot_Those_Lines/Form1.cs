@@ -97,7 +97,7 @@ namespace Plot_Those_Lines
                     {
                         double[] dataY = key.Value.ToArray();
                         var scatter = formsPlot1.Plot.Add.Scatter(dataX, dataY);
-                        s
+                        
                         //shows all teams index
                         scatter.LegendText = key.Key;
                     }
