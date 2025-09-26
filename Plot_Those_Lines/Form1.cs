@@ -103,8 +103,8 @@ namespace Plot_Those_Lines
                         scatter.LegendText = key.Key;
                     }
 
-                    //TODO: make this be custom title by user input
-                    formsPlot1.Plot.Title("NBA teams wins per year");
+                        i++;
+                    }
 
                     //TODO: make this get data from CSV 
                     formsPlot1.Plot.XLabel("Year");
@@ -144,12 +144,51 @@ namespace Plot_Those_Lines
                 {
                     string selectedFile = openFileDialog.FileName;
 
-                        //force copie le fichier
-                        File.Copy(selectedFile, csvFilePath, true);
+                    //Si le fichier existe, compare les 2
+                    if (File.Exists(csvFilePath) && FileCompare(selectedFile, csvFilePath))
+                    {
+                        MessageBox.Show("The selected file is identical to the existing data", "Error - Duplicate file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    //true pour forcer -- windows a des problemes avec la liberte assez souvent
+                    File.Copy(selectedFile, csvFilePath, true);
 
                         //charge et affiche le nouveau fichier CSV
                         LoadCsvAndPlot(csvFilePath);
                 }
+            }
+        }
+
+        /*
+         * Pas mon code, volé de 
+         * https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-file-compare
+         */
+        private bool FileCompare(string file1, string file2)
+        {
+            
+            if (file1 == file2)
+                return true;
+
+            using (FileStream fs1 = new FileStream(file1, FileMode.Open))
+            using (FileStream fs2 = new FileStream(file2, FileMode.Open))
+            {
+                //if not same length -- cannot be the same file
+                if (fs1.Length != fs2.Length)
+                    return false;
+
+                int file1byte;
+                int file2byte;
+
+                //reads bytes of each until finished or mismatch
+                do
+                {
+                    file1byte = fs1.ReadByte();
+                    file2byte = fs2.ReadByte();
+                }
+                while ((file1byte == file2byte) && (file1byte != -1));
+
+                //return bool
+                return (file1byte == file2byte);
             }
         }
         private void formsPlot1_Load(object sender, EventArgs e)
