@@ -34,13 +34,20 @@
 
 ---
 
-## d. Journal de travail
+## d. Details technique
+
+### Stockage
+![Storage Schema](./MaquetteStockage.PNG)
+
+---
+
+## e. Journal de travail
 
 - Le journal de travail a été fait sur GitJournal
 
 --- 
 
-## e. Usage de l’IA dans le projet
+## f. Usage de l’IA dans le projet
 - Explication des apports concrets
 - Réflexion critique sur les avantages et limites
 - L'IA n'a seulement été utilisé pour les taches avec aucune valeure ajouté par humain, par example:
@@ -49,7 +56,7 @@
 
 ---
 
-## f. Conclusion / Bilan
+## g. Conclusion / Bilan
 - Points forts du projet
 - Axes d’amélioration possibles
 - Compétences acquises
