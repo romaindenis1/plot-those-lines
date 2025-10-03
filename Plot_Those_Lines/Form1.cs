@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
 namespace Plot_Those_Lines
 {
     /*
@@ -28,6 +29,16 @@ namespace Plot_Those_Lines
         //au lieu de devoire faire C:/Documents/GitHub..etc
         private string csvFilePath = Path.Combine(Application.StartupPath, "data.csv");
 
+        //classe pour stocker les donnees de chaque serie pour le hover
+        private class SeriesData
+        {
+            public string Name { get; set; }
+            public double[] XValues { get; set; }
+            public double[] YValues { get; set; }
+        }
+        //liste qui garde toutes les donnees pour detection hover
+        private List<SeriesData> allSeriesData = new List<SeriesData>();
+
         public Form1()
         {
             InitializeComponent();
@@ -37,8 +48,10 @@ namespace Plot_Those_Lines
                 LoadCsvAndPlot(csvFilePath);
             else
                 MessageBox.Show("Le fichier data.csv n'existe pas.");
-        }
 
+            //event pour detecter le hover sur les points
+            formsPlot1.MouseMove += FormsPlot1_MouseMove;
+        }
 
         private void LoadCsvAndPlot(string path)
         {
@@ -55,7 +68,7 @@ namespace Plot_Those_Lines
 
                     var years = new List<double>();
                     var data = new Dictionary<string, List<double>>();
-                    
+
                     foreach (var header in headers.Skip(1)) //premiere collone = Annee donc saute
                     {
                         //nouvelle liste vide apart la premiere
@@ -94,6 +107,7 @@ namespace Plot_Those_Lines
 
                     //efface le graphe precedent
                     formsPlot1.Plot.Clear();
+                    allSeriesData.Clear();
 
                     //object de couleur scottplot -- contiend des coleurs tres legeres TODO: FIX
                     var palette = new Category20();
@@ -112,6 +126,13 @@ namespace Plot_Those_Lines
 
                         // label for legend
                         scatter.LegendText = key.Key;
+
+                        allSeriesData.Add(new SeriesData
+                        {
+                            Name = key.Key,
+                            XValues = dataX,
+                            YValues = dataY
+                        });
 
                         i++;
                     }
@@ -135,6 +156,7 @@ namespace Plot_Those_Lines
             }
             //dont remove future me it will do terrible things c# will not be happy
         }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             //dont remove future me it will do terrible things c# will not be happy
@@ -175,7 +197,7 @@ namespace Plot_Those_Lines
          */
         private bool FileCompare(string file1, string file2)
         {
-            
+
             if (file1 == file2)
                 return true;
 
@@ -201,6 +223,7 @@ namespace Plot_Those_Lines
                 return (file1byte == file2byte);
             }
         }
+
         private void formsPlot1_Load(object sender, EventArgs e)
         {
 
@@ -210,6 +233,57 @@ namespace Plot_Those_Lines
         {
             string insertedTitle = textBox1.Text;
             formsPlot1.Plot.Title(insertedTitle);
+            formsPlot1.Refresh();
+        }
+        //trouve et affiche le point le plus proche de la souris
+        //ultra consomateur de memoire
+        private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
+        {
+            var mouseCoord = formsPlot1.Plot.GetCoordinates(e.X, e.Y);
+
+            //distance minimum et texte pour tooltip
+            double minDistance = double.MaxValue;
+            string tooltipText = string.Empty;
+
+            //parcours toutes les series
+            foreach (var series in allSeriesData)
+            {
+                //parcours tous les points de la serie
+                for (int i = 0; i < series.XValues.Length; i++)
+                {
+                    //saute les valeurs NaN
+                    if (double.IsNaN(series.XValues[i]) || double.IsNaN(series.YValues[i]))
+                        continue;
+
+                    //calcule distance en pixels entre souris et point
+                    var pointPixel = formsPlot1.Plot.GetPixel(new ScottPlot.Coordinates(series.XValues[i], series.YValues[i]));
+                    double dx = pointPixel.X - e.X;
+                    double dy = pointPixel.Y - e.Y;
+
+                    //pythagore
+                    double distance = Math.Sqrt(dx * dx + dy * dy);
+
+                    //si ce point est plus proche et dans les 50 pixels
+                    if (distance < minDistance && distance < 50)
+                    {
+                        minDistance = distance;
+                        tooltipText = $"{series.Name}\nYear: {series.XValues[i]:F0}\nValue: {series.YValues[i]:F2}";
+                    }
+                }
+            }
+
+            //affiche tooltip ou titre normal
+            if (!string.IsNullOrEmpty(tooltipText))
+            {
+                formsPlot1.Plot.Axes.Title.Label.Text = tooltipText;
+                formsPlot1.Cursor = Cursors.Hand;
+            }
+            else
+            {
+                formsPlot1.Plot.Axes.Title.Label.Text = textBox1.Text;
+                formsPlot1.Cursor = Cursors.Default;
+            }
+
             formsPlot1.Refresh();
         }
     }
