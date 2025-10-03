@@ -15,6 +15,7 @@
 - P_Fun: Plot Those Lines
 - J'ai décidé de me baser sur les donnés de la NBA
 - Mes donnés sont venus de [BasketballReference](https://www.basketball-reference.com/) et ChatGPT
+- Mes donnés sont dans */doc/data.csv*
 
 - Limites et périmètre du projet
 
@@ -22,7 +23,10 @@
 
 ## b. Planification
 - [GitHub Project](https://github.com/users/romaindenis1/projects/5)
-- Étapes clés du projet
+- Les étapes clés du projet
+    - Planification
+    - Réalisation
+    - Rapport
 - Organisation du travail (planning, deadlines)
 
 ---
@@ -48,11 +52,13 @@
 --- 
 
 ## f. Usage de l’IA dans le projet
-- Explication des apports concrets
+
+- L'AI a seulement été utilisé pour les taches avec aucune valeure ajouté par humain, par example:
+    - Le squelette de rapport
+    - Donnés
+- L'AI a acceleré les taches avec aucune valeur ajouté humain, et la lecture de la documentation (surtout la documentation scottplot qui est compliqué)
 - Réflexion critique sur les avantages et limites
-- L'IA n'a seulement été utilisé pour les taches avec aucune valeure ajouté par humain, par example:
-- Le squelette de rapport
-- Fausses donnés
+
 
 ---
 
