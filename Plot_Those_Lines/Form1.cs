@@ -109,22 +109,27 @@ namespace Plot_Those_Lines
                     formsPlot1.Plot.Clear();
                     allSeriesData.Clear();
 
-                    //object de couleur scottplot -- contiend des coleurs tres legeres TODO: FIX
-                    var palette = new Category20();
-
+                    //fixed, maintenant couleurs uniques pour toute la data
+                    var palette = new List<string> {
+                        "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
+                        "#800000", "#008000", "#000080", "#808000", "#800080", "#008080",
+                        "#FFA500", "#A52A2A", "#5F9EA0", "#D2691E", "#FF7F50", "#6495ED",
+                        "#DC143C", "#00CED1", "#9400D3", "#FF1493", "#00BFFF", "#228B22",
+                        "#8B4513", "#2E8B57", "#FF4500", "#DA70D6", "#7FFF00", "#4169E1"
+                    };
 
                     formsPlot1.Refresh();
 
-                    //key doit etre = var et donc je dois declarer autre iterator
                     int i = 0;
                     foreach (var key in data)
                     {
                         double[] dataY = key.Value.ToArray();
                         var scatter = formsPlot1.Plot.Add.Scatter(dataX, dataY);
 
-                        scatter.Color = palette.GetColor(i);
+                        // Convertir la couleur hexadécimale en ScottPlot.Color
+                        scatter.Color = ScottPlot.Color.FromHex(palette[i % palette.Count]);
 
-                        // label for legend
+                        // Ajouter une légende
                         scatter.LegendText = key.Key;
 
                         allSeriesData.Add(new SeriesData
@@ -141,10 +146,6 @@ namespace Plot_Those_Lines
                     formsPlot1.Plot.XLabel("Year");
                     formsPlot1.Plot.YLabel("Wins");
 
-                    /*
-                     * TODO: figure out how to do this
-                     * formsPlot1.Axes.SetLimits(2000, 2025, 0, 82);
-                     */
                     formsPlot1.Plot.Legend.IsVisible = true;
 
                     formsPlot1.Refresh();
