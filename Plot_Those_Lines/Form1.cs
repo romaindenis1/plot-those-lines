@@ -237,54 +237,92 @@ namespace Plot_Those_Lines
         }
         //trouve et affiche le point le plus proche de la souris
         //ultra consomateur de memoire
-        private void FormsPlot1_MouseMove(object sender, MouseEventArgs e)
+        private void FormsPlot1_MouseMove(object sender, MouseEventArgs mouse)
         {
-            var mouseCoord = formsPlot1.Plot.GetCoordinates(e.X, e.Y);
+            var mouseCoord = formsPlot1.Plot.GetCoordinates(mouse.X, mouse.Y);
 
-            //distance minimum et texte pour tooltip
             double minDistance = double.MaxValue;
-            string tooltipText = string.Empty;
+            double matchedX = double.NaN;
+            double matchedY = double.NaN;
+            List<string> hoveredTeams = new List<string>();
 
             //parcours toutes les series
             foreach (var series in allSeriesData)
             {
-                //parcours tous les points de la serie
                 for (int i = 0; i < series.XValues.Length; i++)
                 {
-                    //saute les valeurs NaN
+                    //skip points invalides --theoriquement pas besoin par ce que c'est check
+                    //a l'import mais l'import ne check pas les valeurs negatives TODO fix eventuellement
                     if (double.IsNaN(series.XValues[i]) || double.IsNaN(series.YValues[i]))
                         continue;
 
                     //calcule distance en pixels entre souris et point
                     var pointPixel = formsPlot1.Plot.GetPixel(new ScottPlot.Coordinates(series.XValues[i], series.YValues[i]));
-                    double dx = pointPixel.X - e.X;
-                    double dy = pointPixel.Y - e.Y;
 
-                    //pythagore
-                    double distance = Math.Sqrt(dx * dx + dy * dy);
+                    //calcule difference avec pythogore
+                    double diffx = pointPixel.X - mouse.X;
+                    double diffy = pointPixel.Y - mouse.Y;
+                    double distance = Math.Sqrt(diffx * diffx + diffy * diffy);
 
                     //si ce point est plus proche et dans les 50 pixels
                     if (distance < minDistance && distance < 50)
                     {
                         minDistance = distance;
-                        tooltipText = $"{series.Name}\nYear: {series.XValues[i]:F0}\nValue: {series.YValues[i]:F2}";
+                        matchedX = series.XValues[i];
+                        matchedY = series.YValues[i];
                     }
                 }
             }
 
             //affiche tooltip ou titre normal
-            if (!string.IsNullOrEmpty(tooltipText))
+            if (double.IsNaN(matchedX) || double.IsNaN(matchedY))
             {
-                formsPlot1.Plot.Axes.Title.Label.Text = tooltipText;
+                label1.Text = "";
+                formsPlot1.Cursor = Cursors.Default;
+                return;
+            }
+
+            
+            hoveredTeams.Clear();
+            double tolerance = 1e-6; //nesseaire par ce que 1.00001 != 1, donc comme ca c'est accurate a 1 millionth 
+
+            foreach (var series in allSeriesData)
+            {
+                for (int i = 0; i < series.XValues.Length; i++)
+                {
+                    if (double.IsNaN(series.XValues[i]) || double.IsNaN(series.YValues[i]))
+                        continue;
+
+                    if (Math.Abs(series.XValues[i] - matchedX) < tolerance &&
+                        Math.Abs(series.YValues[i] - matchedY) < tolerance)
+                        //prend valeur absolue avec tolerance 
+                        // 1.01 != 1 (25mins de debug pour ca)
+                    {
+                        if (!hoveredTeams.Contains(series.Name))
+                            hoveredTeams.Add(series.Name);
+                    }
+                }
+            }
+
+            if (hoveredTeams.Count > 0)
+            {
+                string hoverText = $"Year: {matchedX:F0}\nValue: {matchedY:F2}\nTeams:\n{string.Join("\n", hoveredTeams)}";
+                label1.Text = hoverText;
+                //met curseur main par ce que c'est plus beau
                 formsPlot1.Cursor = Cursors.Hand;
             }
             else
             {
-                formsPlot1.Plot.Axes.Title.Label.Text = textBox1.Text;
+                label1.Text = "";
                 formsPlot1.Cursor = Cursors.Default;
             }
+        }
 
-            formsPlot1.Refresh();
+
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
