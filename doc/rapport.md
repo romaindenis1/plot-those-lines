@@ -33,11 +33,22 @@
 ---
 
 ## Rapport de tests
-- Méthodologie de test adoptée
-- Résultats obtenus
-- Problèmes rencontrés et corrections apportées
 
----
+Tous les tests d'acceptaces ont été vérifiés et sont OK.
+
+| User story | Critères d'acceptation (résumé) | Statut | Lien (issue / user story) |
+|---|---:|:---:|---|
+| Une ligne par entrée de données | Pour chaque entrée importée, une courbe/ligne est tracée représentant les valeurs | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/1) |
+| Même période pour toutes les séries | Toutes les séries partagent le même axe temporel / même plage X lors de l'affichage | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/1) |
+| Zoom (Ctrl + molette) | Ctrl + molette effectue un zoom centré et fluide de l'affichage | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/2) |
+| Échelles visibles | Échelles X et Y affichées et visibles quand les données sont importées | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/2) |
+| Labels colorés | Chaque série a un label/texte affiché dans la couleur correspondante sur le graphique | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/2) |
+| Valeur au survol | Au survol d'un point, la valeur exacte et la date sont affichées | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/2) |
+| Titre personnalisé | L'utilisateur peut entrer un titre via le champ et l'appliquer au graphique | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/2) |
+| Aucun graphique au premier lancement | À la première ouverture, l'application n'affiche pas de graphique par défaut | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3) |
+| Restauration du graphique précédent | Après la première utilisation, le graphique précédemment affiché se recharge à l'ouverture suivante | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3) |
+| Import robuste & gestion d'erreurs | Import CSV : données valides importées; en cas d'erreur (type, vide, pas de changement), l'import est rejeté avec message d'erreur explicite | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3) |
+| Pas d'import en double | Si les mêmes données existent déjà, l'import est refusé et l'utilisateur est informé | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3) |
 
 ## Maquettes
 
