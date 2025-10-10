@@ -39,18 +39,26 @@
 
 ---
 
-## Details technique
+## Maquettes
 
-### Stockage
-![Storage Schema](./MaquetteStockage.PNG)
+Representation Graphique
+![Maquette Representation Graphique](./MaquetteRepGraphique.png)
+Pour cette maquette, on cherche a montrer les parametres d'affichage. On montre que le graphique doit avoire un axe x et y, et que il y a une legende avec la couleur et le nom d'une donné. 
 
----
+Flexibilité D'affichage
+![Maquette Flexibilité d'Affichage](./MaqDisplayFlex.png)
+Pour cette maquette, on cherche a montrer que il y a un slider pour zoomer et dezoomer le graphique, et que il y a aussi un affichage de la date et de la valeur d'une donné si la souris et mis sur une donne.
 
-## Journal de travail
+Importation de donnes flexible
+![Stockage Schema](./MaquetteStockage.PNG) 
+![Maquette Stockage 2](./MaquetteStockage2.png)
+Pour cette maquette, on cherche a montrer qu'il y a un bouton pour importer.
+Dans le schema, on cherche a montrer comment les donnés sont stockés de manières permanentes. Si les donnes sont validés par le programme, le fichier est copié dans le repertoire du programme et ensuite chargé pour etre affiché.
 
-- Le journal de travail a été fait sur GitJournal
+Affichage de Fonctions Mathematiques
 
---- 
+![Maquette Mathematique](./MaqMath.png)
+Dans cette maquette, on cherche a montrer que en utilisant la boite de texte, on peux entrer une fonction mathematique et la faire apparaitre avec nos autre donnés. Meme si cette fonctionalité n'est pas implémenté dans mon code, je pense que elle est assez claire pour que moi ou un autre developpeur puisse la réaliser dans le futur
 
 ## Usage de l’IA dans le projet
 
