@@ -6,7 +6,7 @@
 
 **Dates:** 29.08.2025 - 09.01.2026
 
-## a. Introduction
+## Introduction
 
 ### Objectifs du produit et pédagogiques
 - Concevoir un logiciel pour afficher des graphiques sur des données
@@ -21,8 +21,9 @@
 
 ---
 
-## b. Planification
+## Planification
 - [GitHub Project](https://github.com/users/romaindenis1/projects/5)
+- [Issues GitHub] (https://github.com/romaindenis1/plot-those-lines/issues?q=is%3Aissue)
 - Les étapes clés du projet
     - Planification
     - Réalisation
@@ -31,27 +32,27 @@
 
 ---
 
-## c. Rapport de tests
+## Rapport de tests
 - Méthodologie de test adoptée
 - Résultats obtenus
 - Problèmes rencontrés et corrections apportées
 
 ---
 
-## d. Details technique
+## Details technique
 
 ### Stockage
 ![Storage Schema](./MaquetteStockage.PNG)
 
 ---
 
-## e. Journal de travail
+## Journal de travail
 
 - Le journal de travail a été fait sur GitJournal
 
 --- 
 
-## f. Usage de l’IA dans le projet
+## Usage de l’IA dans le projet
 
 - L'AI a seulement été utilisé pour les taches avec aucune valeure ajouté par humain, par example:
     - Le squelette de rapport
@@ -62,7 +63,7 @@
 
 ---
 
-## g. Conclusion / Bilan
+## Conclusion / Bilan
 - Points forts du projet
 - Axes d’amélioration possibles
 - Compétences acquises
