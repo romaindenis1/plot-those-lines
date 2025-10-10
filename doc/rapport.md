@@ -7,30 +7,24 @@
 **Dates:** 29.08.2025 - 09.01.2026
 
 ## Introduction
+## Détails techniques
 
-### Objectifs du produit et pédagogiques
-- Concevoir un logiciel pour afficher des graphiques sur des données
+### Parsing et I/O
+La lecture CSV se fait dans `LoadCsvAndPlot` avec `StreamReader` + `CsvReader`. (`csv.ReadHeader()`) est utilisé pour créer la  `data`. Le chemin par défaut `csvFilePath` (dans `Application.StartupPath`) permet de charger un fichier a l'execution.
 
-### Description du domaine
-- P_Fun: Plot Those Lines
-- J'ai décidé de me baser sur les donnés de la NBA
-- Mes donnés sont venus de [BasketballReference](https://www.basketball-reference.com/) et ChatGPT
-- Mes donnés sont dans */doc/data.csv*
+Pour chaque ligne, la première colonne est parsée comme X (car la premiere collone est l'année) avec `TryParse`; en cas d'échec on stocke `double.NaN`. Les autres colonnes sont parsées comme Y (car se sont les donnes a mettre sur le graphique) avec `TryParse(csv.GetField(pos), out var val)` et ajoutées aux listes du dictionnaire `data`.
 
-- Limites et périmètre du projet
+### Modèle en mémoire
+Les données sont stockées dans `Dictionary<string, List<double>> data` et `List<double> years`. Avant l'affichage, `years` devient `double[] dataX`. Pour l'interaction, chaque série est convertie en `SeriesData { Name, XValues, YValues }` (tableaux) et ajoutée à `List<SeriesData> allSeriesData` pour la lire.
 
----
+### Affichage
+Le affichage utilise ScottPlot : on appelle `formsPlot1.Plot.Add.Scatter(dataX, yValues)` pour chaque série. La couleur est choisie par le tableau `palette`. Les axes et la légende sont activés avec `Plot.XLabel`, `Plot.YLabel` et `Plot.Legend.IsVisible`.
 
-## Planification
-- [GitHub Project](https://github.com/users/romaindenis1/projects/5)
-- [Issues GitHub] (https://github.com/romaindenis1/plot-those-lines/issues?q=is%3Aissue)
-- Les étapes clés du projet
-    - Planification
-    - Réalisation
-    - Rapport
-- Organisation du travail (planning, deadlines)
+### Hover
+Sur `MouseMove`, on obtient la position souris via `GetCoordinates`. On parcourt les points, convertit chaque point en pixel (`Plot.GetPixel`) et calcule la distance pour trouver le point le plus proche dans un aire de 50 px. Ensuite un filtre LINQ (`Math.Abs(p.X - matchedX) < tolerance`) identifie toutes les séries contenant ce point. Les noms sont affichés dans `label1`.
 
----
+### Import et doublons
+Le bouton d'import ouvre `OpenFileDialog`. Le fichier sélectionné est comparé au fichier préchargé a `csvFilePath` existant via `FileCompare` (byte par byte). Si différent, on copie le fichier puis on re appelle `LoadCsvAndPlot`. Sinon, on ne charge pas le fichier (par ce que il est identique) et on alerte avec `MessageBox.Show`.
 
 ## Rapport de tests
 
