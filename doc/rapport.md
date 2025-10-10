@@ -1,8 +1,47 @@
-# Rapport *Plot those dots*
+# Rapport — Plot Those Lines
 
-**Eleve:** Romain Denis
+**Élève :** Romain Denis  
+**Client :** Xavier Carrel  
+**Période :** 29.08.2025 — 09.01.2026
 
-**Client:** Xavier Carrel
+## Description du domaine
+
+Application C# permettant d'importer et d'afficher des séries temporelles. L'utilisateur peut ajouter de nouveaux fichiers CSV sans perdre les données déjà chargées.
+
+Cas d'usage principal : visualiser le nombre de victoires par équipe (ex. NBA) au fil des années. Le format attendu du CSV est : YEAR, TEAM1, TEAM2, ... ; chaque cellule représente le nombre de victoires pour l'équipe et l'année indiquées (ex. : 2025, 52, 48, ...). Si le format n'est pas respecté, l'application affiche un message d'erreur et refuse l'import.
+
+L'interface permet de naviguer dans le temps et d'ajuster le zoom pour explorer les courbes.
+
+## Objectifs pédagogiques
+
+- Mettre en pratique C# (List, Dictionary, tableaux), LINQ et bonnes pratiques.  
+- Organiser un projet : user stories, planification, gestion Git et tests d'acceptance.  
+- Traiter des données : parsing, gestion des NaN et comparaisons flottantes (tolérances).
+
+## Objectifs produit
+
+- Visualiser des séries depuis CSV/JSON/API.  
+- Comparer plusieurs courbes, tracer des fonctions, afficher légendes et couleurs.  
+- Interactions clés : hover, zoom et export simple.
+
+## Domaine d’application
+
+Le thème que j’ai choisi les vicioires des equipes NBA au fil du temps
+
+Le but derrière est de pouvoir visualiser comment certaines equipes ont dominer leurs epoques et pour observer les evenements (lockout 1995, covid)
+
+Cela va donc permettre de comparer les differentes epoques, et leurs meilleur (et pires) equipes
+
+Plus précisément :
+
+-	Les victoires d'une certaines equipes
+-	Differentes saisons
+-	Liste de nom et d’années à mettre sur le graphique
+
+Les moyens de récupérer ces données seront les suivantes :
+
+-	https://www.basketball-reference.com/
+-	ChatGPT
 
 **Dates:** 29.08.2025 - 09.01.2026
 
