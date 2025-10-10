@@ -5,6 +5,8 @@
 *.db
 *.opendb
 
+*.pdf
+
 bin/
 obj/
 *.exe
