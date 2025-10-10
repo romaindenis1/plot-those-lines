@@ -37,9 +37,9 @@
             // formsPlot1
             // 
             this.formsPlot1.DisplayScale = 0F;
-            this.formsPlot1.Location = new System.Drawing.Point(154, 50);
+            this.formsPlot1.Location = new System.Drawing.Point(61, 50);
             this.formsPlot1.Name = "formsPlot1";
-            this.formsPlot1.Size = new System.Drawing.Size(1124, 612);
+            this.formsPlot1.Size = new System.Drawing.Size(1268, 612);
             this.formsPlot1.TabIndex = 0;
             this.formsPlot1.Load += new System.EventHandler(this.formsPlot1_Load);
             // 
@@ -64,7 +64,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(42, 160);
+            this.label1.Location = new System.Drawing.Point(-1, 71);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 4;

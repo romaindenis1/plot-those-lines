@@ -69,11 +69,8 @@ namespace Plot_Those_Lines
                     var years = new List<double>();
                     var data = new Dictionary<string, List<double>>();
 
-                    foreach (var header in headers.Skip(1)) //premiere collone = Annee donc saute
-                    {
-                        //nouvelle liste vide apart la premiere
-                        data[header] = new List<double>();
-                    }
+                    //Skip(1) par ce que la premiere collone sont les années
+                    headers.Skip(1).ToList().ForEach(header => data[header] = new List<double>());
 
                     while (csv.Read())
                     {
@@ -88,18 +85,9 @@ namespace Plot_Those_Lines
                         }
 
                         //puts data into dictionary
-                        foreach (var pos in data.Keys.ToList())
-                        {
-                            double val;
-                            if (double.TryParse(csv.GetField(pos), out val))
-                            {
-                                data[pos].Add(val);
-                            }
-                            else
-                            {
-                                data[pos].Add(double.NaN);
-                            }
-                        }
+                        data.Keys.ToList().
+                            ForEach(pos => data[pos].Add(double.TryParse(csv.GetField(pos), out var val)
+                            ? val : double.NaN));
                     }
 
                     //put list onto array
@@ -120,27 +108,21 @@ namespace Plot_Those_Lines
 
                     formsPlot1.Refresh();
 
-                    int i = 0;
-                    foreach (var key in data)
-                    {
-                        double[] dataY = key.Value.ToArray();
-                        var scatter = formsPlot1.Plot.Add.Scatter(dataX, dataY);
-
-                        // Convertir la couleur hexadécimale en ScottPlot.Color
-                        scatter.Color = ScottPlot.Color.FromHex(palette[i % palette.Count]);
-
-                        // Ajouter une légende
-                        scatter.LegendText = key.Key;
-
-                        allSeriesData.Add(new SeriesData
+                    data.Select((key, idx) => new { Key = key.Key, Values = key.Value.ToArray(), Index = idx })
+                        .ToList()
+                        .ForEach(entry =>
                         {
-                            Name = key.Key,
-                            XValues = dataX,
-                            YValues = dataY
-                        });
+                            var scatter = formsPlot1.Plot.Add.Scatter(dataX, entry.Values);
+                            scatter.Color = ScottPlot.Color.FromHex(palette[entry.Index % palette.Count]);
+                            scatter.LegendText = entry.Key;
 
-                        i++;
-                    }
+                            allSeriesData.Add(new SeriesData
+                            {
+                                Name = entry.Key,
+                                XValues = dataX,
+                                YValues = entry.Values
+                            });
+                        });
 
                     //TODO: make this get data from CSV 
                     formsPlot1.Plot.XLabel("Year");
@@ -247,6 +229,7 @@ namespace Plot_Those_Lines
             double matchedY = double.NaN;
             List<string> hoveredTeams = new List<string>();
 
+            //TODO: CONVERT TO LINQ
             //parcours toutes les series
             foreach (var series in allSeriesData)
             {
@@ -304,6 +287,7 @@ namespace Plot_Those_Lines
                     }
                 }
             }
+            //TODO: CONVERT TO LINQ
 
             if (hoveredTeams.Count > 0)
             {
