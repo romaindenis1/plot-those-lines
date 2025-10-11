@@ -31,11 +31,14 @@
 
 ## 10.10 (80%)
 
-- Rythme (avancement du code):
-- Qualité (normes, commentaires):
-- Connaissances professionnelles (LinQ):
-- Processus de travail (jdt, git, git project, release):
-- Expression (user stories, rapport):
-- Ecologie (.gitignore):
-- Attitude groupe:
-- Attitude personnelle:
+- Rythme (avancement du code): KO, il faut encore au minimium
+  - pouvoir cacher certaines lignes du graphique
+  - pouvoir charger des données qui viennent compléter celle du stockage permanent
+- Qualité (normes, commentaires): KO, il faut encore:
+  - utiliser des identificateurs qui ont du sens à la place de ceux attribués par défaut, par visuel, studio (form1, textBox1, ...)
+- Connaissances professionnelles (LinQ): KO, reste à "payer" la dette technique que vous avez correctement identifié dans votre code
+- Processus de travail (jdt, git, git project, release): tant que le projet est en cours, vous aurez neuf fois sur 10 minimum quelque chose dans la colonne in progress. Ce n'est pas le cas en ce moment. À part ça tout va bien.
+- Expression (user stories, rapport): il ne reste plus qu'à étoffer le rapport dont les sections sont pour la plupart trop courtes
+- Ecologie (.gitignore): OK
+- Attitude groupe: bien
+- Attitude personnelle: bien
