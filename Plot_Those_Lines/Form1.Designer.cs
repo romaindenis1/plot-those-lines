@@ -20,66 +20,66 @@
             base.Dispose(disposing);
         }
 
-        #region Code généré par le Concepteur Windows Form
+    #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Méthode requise pour la prise en charge du concepteur - ne modifiez pas
-        /// le contenu de cette méthode avec l'éditeur de code.
-        /// </summary>
-        private void InitializeComponent()
+    /// <summary>
+    /// Méthode requise pour la prise en charge du concepteur - ne modifiez pas
+    /// le contenu de cette méthode avec l'éditeur de code.
+    /// </summary>
+    private void InitializeComponent()
         {
-            this.formsPlot1 = new ScottPlot.WinForms.FormsPlot();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.pltMain = new ScottPlot.WinForms.FormsPlot();
+            this.btnImport = new System.Windows.Forms.Button();
+            this.txtTitle = new System.Windows.Forms.TextBox();
+            this.pltTeams = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // formsPlot1
+            // pltMain
             // 
-            this.formsPlot1.DisplayScale = 0F;
-            this.formsPlot1.Location = new System.Drawing.Point(61, 50);
-            this.formsPlot1.Name = "formsPlot1";
-            this.formsPlot1.Size = new System.Drawing.Size(1268, 612);
-            this.formsPlot1.TabIndex = 0;
-            this.formsPlot1.Load += new System.EventHandler(this.formsPlot1_Load);
+            this.pltMain.DisplayScale = 0F;
+            this.pltMain.Location = new System.Drawing.Point(61, 50);
+            this.pltMain.Name = "pltMain";
+            this.pltMain.Size = new System.Drawing.Size(1268, 612);
+            this.pltMain.TabIndex = 0;
+            this.pltMain.Load += new System.EventHandler(this.pltMain_Load);
             // 
-            // button1
+            // btnImport
             // 
-            this.button1.Location = new System.Drawing.Point(12, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Importer";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.btnImport.Location = new System.Drawing.Point(12, 12);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(75, 23);
+            this.btnImport.TabIndex = 1;
+            this.btnImport.Text = "Importer";
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
             // 
-            // textBox1
+            // txtTitle
             // 
-            this.textBox1.Location = new System.Drawing.Point(93, 14);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(120, 20);
-            this.textBox1.TabIndex = 3;
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged_1);
+            this.txtTitle.Location = new System.Drawing.Point(93, 14);
+            this.txtTitle.Name = "txtTitle";
+            this.txtTitle.Size = new System.Drawing.Size(120, 20);
+            this.txtTitle.TabIndex = 3;
+            this.txtTitle.TextChanged += new System.EventHandler(this.txtTitle_TextChanged);
             // 
-            // label1
+            // pltTeams
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(-1, 71);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "label1";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.pltTeams.AutoSize = true;
+            this.pltTeams.Location = new System.Drawing.Point(-1, 71);
+            this.pltTeams.Name = "pltTeams";
+            this.pltTeams.Size = new System.Drawing.Size(35, 13);
+            this.pltTeams.TabIndex = 4;
+            this.pltTeams.Text = "label1";
+            this.pltTeams.Click += new System.EventHandler(this.pltTeams_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1341, 764);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.formsPlot1);
+            this.Controls.Add(this.pltTeams);
+            this.Controls.Add(this.txtTitle);
+            this.Controls.Add(this.btnImport);
+            this.Controls.Add(this.pltMain);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -90,10 +90,10 @@
 
         #endregion
 
-        private ScottPlot.WinForms.FormsPlot formsPlot1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label1;
+        private ScottPlot.WinForms.FormsPlot pltMain;
+        private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.TextBox txtTitle;
+        private System.Windows.Forms.Label pltTeams;
     }
 }
 

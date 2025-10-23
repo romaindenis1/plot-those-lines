@@ -50,7 +50,7 @@ namespace Plot_Those_Lines
                 MessageBox.Show("Le fichier data.csv n'existe pas.");
 
             //event pour detecter le hover sur les points
-            formsPlot1.MouseMove += FormsPlot1_MouseMove;
+            pltMain.MouseMove += FormsPlot1_MouseMove;
         }
 
         private void LoadCsvAndPlot(string path)
@@ -94,7 +94,7 @@ namespace Plot_Those_Lines
                     double[] dataX = years.ToArray();
 
                     //efface le graphe precedent
-                    formsPlot1.Plot.Clear();
+                    pltMain.Plot.Clear();
                     allSeriesData.Clear();
 
                     //fixed, maintenant couleurs uniques pour toute la data
@@ -106,13 +106,13 @@ namespace Plot_Those_Lines
                         "#8B4513", "#2E8B57", "#FF4500", "#DA70D6", "#7FFF00", "#4169E1"
                     };
 
-                    formsPlot1.Refresh();
+                    pltMain.Refresh();
 
                     data.Select((key, idx) => new { Key = key.Key, Values = key.Value.ToArray(), Index = idx })
                         .ToList()
                         .ForEach(entry =>
                         {
-                            var scatter = formsPlot1.Plot.Add.Scatter(dataX, entry.Values);
+                            var scatter = pltMain.Plot.Add.Scatter(dataX, entry.Values);
                             scatter.Color = ScottPlot.Color.FromHex(palette[entry.Index % palette.Count]);
                             scatter.LegendText = entry.Key;
 
@@ -125,12 +125,12 @@ namespace Plot_Those_Lines
                         });
 
                     //TODO: make this get data from CSV 
-                    formsPlot1.Plot.XLabel("Year");
-                    formsPlot1.Plot.YLabel("Wins");
+                    pltMain.Plot.XLabel("Year");
+                    pltMain.Plot.YLabel("Wins");
 
-                    formsPlot1.Plot.Legend.IsVisible = true;
+                    pltMain.Plot.Legend.IsVisible = true;
 
-                    formsPlot1.Refresh();
+                    pltMain.Refresh();
                 }
             }
             catch (Exception ex)
@@ -143,10 +143,10 @@ namespace Plot_Those_Lines
         private void Form1_Load(object sender, EventArgs e)
         {
             //dont remove future me it will do terrible things c# will not be happy
-            textBox1.Text = "Enter your title here...";
+            txtTitle.Text = "Enter your title here...";
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+    private void btnImport_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -207,22 +207,22 @@ namespace Plot_Those_Lines
             }
         }
 
-        private void formsPlot1_Load(object sender, EventArgs e)
+        private void pltMain_Load(object sender, EventArgs e)
         {
 
         }
 
-        private void textBox1_TextChanged_1(object sender, EventArgs e)
+        private void txtTitle_TextChanged(object sender, EventArgs e)
         {
-            string insertedTitle = textBox1.Text;
-            formsPlot1.Plot.Title(insertedTitle);
-            formsPlot1.Refresh();
+            string insertedTitle = txtTitle.Text;
+            pltMain.Plot.Title(insertedTitle);
+            pltMain.Refresh();
         }
         //trouve et affiche le point le plus proche de la souris
         //ultra consomateur de memoire
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs mouse)
         {
-            var mouseCoord = formsPlot1.Plot.GetCoordinates(mouse.X, mouse.Y);
+            var mouseCoord = pltMain.Plot.GetCoordinates(mouse.X, mouse.Y);
 
             double minDistance = double.MaxValue;
             double matchedX = double.NaN;
@@ -241,7 +241,7 @@ namespace Plot_Those_Lines
                         continue;
 
                     //calcule distance en pixels entre souris et point
-                    var pointPixel = formsPlot1.Plot.GetPixel(new ScottPlot.Coordinates(series.XValues[i], series.YValues[i]));
+                    var pointPixel = pltMain.Plot.GetPixel(new ScottPlot.Coordinates(series.XValues[i], series.YValues[i]));
 
                     //calcule difference avec pythogore
                     double diffx = pointPixel.X - mouse.X;
@@ -261,8 +261,8 @@ namespace Plot_Those_Lines
             //affiche tooltip ou titre normal
             if (double.IsNaN(matchedX) || double.IsNaN(matchedY))
             {
-                label1.Text = "";
-                formsPlot1.Cursor = Cursors.Default;
+                pltTeams.Text = "";
+                pltMain.Cursor = Cursors.Default;
                 return;
             }
 
@@ -292,20 +292,20 @@ namespace Plot_Those_Lines
             if (hoveredTeams.Count > 0)
             {
                 string hoverText = $"Year: {matchedX:F0}\nValue: {matchedY:F2}\nTeams:\n{string.Join("\n", hoveredTeams)}";
-                label1.Text = hoverText;
+                pltTeams.Text = hoverText;
                 //met curseur main par ce que c'est plus beau
-                formsPlot1.Cursor = Cursors.Hand;
+                pltMain.Cursor = Cursors.Hand;
             }
             else
             {
-                label1.Text = "";
-                formsPlot1.Cursor = Cursors.Default;
+                pltTeams.Text = "";
+                pltMain.Cursor = Cursors.Default;
             }
         }
 
 
 
-        private void label1_Click(object sender, EventArgs e)
+    private void pltTeams_Click(object sender, EventArgs e)
         {
 
         }
