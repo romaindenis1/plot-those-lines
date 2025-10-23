@@ -39,6 +39,23 @@ namespace Plot_Those_Lines
         //liste qui garde toutes les donnees pour detection hover
         private List<SeriesData> allSeriesData = new List<SeriesData>();
 
+    // liste des scatters courants (une par serie)
+    private List<ScottPlot.Plottables.Scatter> courbesGlobal = new List<ScottPlot.Plottables.Scatter>();
+    // quand on change les cases par code, desactive les handlers
+    private bool suppressCheckboxEvents = false;
+
+    // palette de couleurs pour les series
+        private readonly List<string> palette = new List<string> {
+            "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
+            "#800000", "#008000", "#000080", "#808000", "#800080", "#008080",
+            "#FFA500", "#A52A2A", "#5F9EA0", "#D2691E", "#FF7F50", "#6495ED",
+            "#DC143C", "#00CED1", "#9400D3", "#FF1493", "#00BFFF", "#228B22",
+            "#8B4513", "#2E8B57", "#FF4500", "#DA70D6", "#7FFF00", "#4169E1"
+        };
+
+    // map nom serie -> couleur pour la liste
+    private readonly Dictionary<string, System.Drawing.Color> seriesColors = new Dictionary<string, System.Drawing.Color>(StringComparer.OrdinalIgnoreCase);
+
         public PlotForm()
         {
             InitializeComponent();
@@ -84,38 +101,24 @@ namespace Plot_Those_Lines
                             years.Add(double.NaN);
                         }
 
-                        //puts data into dictionary
+                        // met les donnees dans le dictionnaire
                         data.Keys.ToList().
                             ForEach(pos => data[pos].Add(double.TryParse(csv.GetField(pos), out var val)
                             ? val : double.NaN));
                     }
 
-                    //put list onto array
+                    // mettre la liste en tableau
                     double[] dataX = years.ToArray();
 
-                    //efface le graphe precedent
+                    // efface le graphe precedent
                     pltMain.Plot.Clear();
                     allSeriesData.Clear();
 
-                    //fixed, maintenant couleurs uniques pour toute la data
-                    var palette = new List<string> {
-                        "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
-                        "#800000", "#008000", "#000080", "#808000", "#800080", "#008080",
-                        "#FFA500", "#A52A2A", "#5F9EA0", "#D2691E", "#FF7F50", "#6495ED",
-                        "#DC143C", "#00CED1", "#9400D3", "#FF1493", "#00BFFF", "#228B22",
-                        "#8B4513", "#2E8B57", "#FF4500", "#DA70D6", "#7FFF00", "#4169E1"
-                    };
-
-                    pltMain.Refresh();
-
+                    // stocke les series dans allSeriesData pour hover et toggle
                     data.Select((key, idx) => new { Key = key.Key, Values = key.Value.ToArray(), Index = idx })
                         .ToList()
                         .ForEach(entry =>
                         {
-                            var scatter = pltMain.Plot.Add.Scatter(dataX, entry.Values);
-                            scatter.Color = ScottPlot.Color.FromHex(palette[entry.Index % palette.Count]);
-                            scatter.LegendText = entry.Key;
-
                             allSeriesData.Add(new SeriesData
                             {
                                 Name = entry.Key,
@@ -124,11 +127,66 @@ namespace Plot_Those_Lines
                             });
                         });
 
-                    //TODO: make this get data from CSV 
+                    // creer checkboxes dynamiques et courbes scottplot
+                    if (flpSeries != null)
+                    {
+                        flpSeries.Controls.Clear();
+                    }
+
+                    // vide les courbes existantes
+                    pltMain.Plot.Clear();
+                    courbesGlobal.Clear();
+
+                    for (int i = 0; i < allSeriesData.Count; i++)
+                    {
+                        var s = allSeriesData[i];
+                        var hex = palette[i % palette.Count];
+                        var color = ParseHexColor(hex);
+                        seriesColors[s.Name] = color;
+
+                        // ajoute la courbe au graphe
+                        var scatter = pltMain.Plot.Add.Scatter(s.XValues, s.YValues);
+                        scatter.Color = ScottPlot.Color.FromColor(System.Drawing.Color.FromArgb(color.R, color.G, color.B));
+                        scatter.LineWidth = 2;
+                        scatter.MarkerSize = 0;
+                        scatter.LegendText = s.Name;
+                        courbesGlobal.Add(scatter);
+
+                        // creer la checkbox pour cette serie
+                        if (flpSeries != null)
+                        {
+                            var cb = new CheckBox();
+                            cb.AutoSize = true;
+                            cb.Text = s.Name;
+                            cb.Checked = true;
+                            cb.ForeColor = color;
+                            cb.Margin = new Padding(3, 3, 3, 3);
+                            int idx = i; // capture
+                            cb.CheckedChanged += (sender, e) =>
+                            {
+                                if (suppressCheckboxEvents) return;
+                                if (idx >= 0 && idx < courbesGlobal.Count)
+                                {
+                                    courbesGlobal[idx].IsVisible = cb.Checked;
+                                    pltMain.Refresh();
+                                }
+                            };
+                            flpSeries.Controls.Add(cb);
+                        }
+                    }
+
+                    // finalise le graphe
+                    pltMain.Plot.Title("Plot");
+                    pltMain.Refresh();
+
+                    // dessine selon les cases cochees
+                    RenderPlots();
+
+                    // todo: recuperer ces labels depuis le csv
                     pltMain.Plot.XLabel("Year");
                     pltMain.Plot.YLabel("Wins");
 
-                    pltMain.Plot.Legend.IsVisible = true;
+                    pltMain.Plot.Legend.IsVisible = false;
 
                     pltMain.Refresh();
                 }
@@ -137,17 +195,11 @@ namespace Plot_Those_Lines
             {
                 MessageBox.Show("Erreur lors du chargement du CSV : " + ex.Message);
             }
-            //dont remove future me it will do terrible things c# will not be happy
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            //dont remove future me it will do terrible things c# will not be happy
-            txtTitle.Text = "Enter your title here...";
-        }
+
             private void PlotForm_Load(object sender, EventArgs e)
             {
-                //dont remove future me it will do terrible things c# will not be happy
                 txtTitle.Text = "Enter your title here...";
             }
 
@@ -222,6 +274,73 @@ namespace Plot_Those_Lines
             string insertedTitle = txtTitle.Text;
             pltMain.Plot.Title(insertedTitle);
             pltMain.Refresh();
+        }
+
+        // Render all series to the plot if chkShowData is checked
+        private void RenderPlots()
+        {
+            // use the existing scatters in courbesGlobal and the checkboxes in flpSeries
+            if (chkShowData == null || !chkShowData.Checked)
+            {
+                // hide all
+                foreach (var c in courbesGlobal) c.IsVisible = false;
+                pltMain.Refresh();
+                return;
+            }
+
+            // for each checkbox in flpSeries, toggle the corresponding scatter visibility
+            for (int i = 0; i < courbesGlobal.Count; i++)
+            {
+                var scatter = courbesGlobal[i];
+                bool visible = true;
+                if (flpSeries != null && i < flpSeries.Controls.Count)
+                {
+                    if (flpSeries.Controls[i] is CheckBox cb)
+                        visible = cb.Checked;
+                }
+                scatter.IsVisible = visible;
+            }
+
+            pltMain.Refresh();
+        }
+
+        private void chkShowData_CheckedChanged(object sender, EventArgs e)
+        {
+            // When the global toggle is changed, check/uncheck all series checkboxes
+            if (flpSeries != null)
+            {
+                suppressCheckboxEvents = true;
+                bool newState = chkShowData.Checked;
+                foreach (Control c in flpSeries.Controls)
+                {
+                    if (c is CheckBox cb)
+                        cb.Checked = newState;
+                }
+                suppressCheckboxEvents = false;
+            }
+
+            // Now update visibility in one go
+            RenderPlots();
+        }
+
+        // parse #RRGGBB or RRGGBB into a Color; fallback to Black on error
+        private System.Drawing.Color ParseHexColor(string hex)
+        {
+            if (string.IsNullOrWhiteSpace(hex)) return System.Drawing.Color.Black;
+            hex = hex.Trim();
+            if (hex.StartsWith("#")) hex = hex.Substring(1);
+            if (hex.Length != 6) return System.Drawing.Color.Black;
+            try
+            {
+                int r = int.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+                int g = int.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                int b = int.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                return System.Drawing.Color.FromArgb(r, g, b);
+            }
+            catch
+            {
+                return System.Drawing.Color.Black;
+            }
         }
         //trouve et affiche le point le plus proche de la souris
         //ultra consomateur de memoire

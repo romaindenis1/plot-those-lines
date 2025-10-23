@@ -23,29 +23,31 @@ namespace Plot_Those_Lines
     #region Windows Form Designer generated code
 
     /// <summary>
-    /// Méthode requise pour la prise en charge du concepteur - ne modifiez pas
-    /// le contenu de cette méthode avec l'éditeur de code.
+    /// methode requise pour le designer
+    /// le contenu de cette methode avec l'editeur de code
     /// </summary>
     private void InitializeComponent()
         {
             this.pltMain = new ScottPlot.WinForms.FormsPlot();
             this.btnImport = new System.Windows.Forms.Button();
             this.txtTitle = new System.Windows.Forms.TextBox();
+            this.chkShowData = new System.Windows.Forms.CheckBox();
+            this.flpSeries = new System.Windows.Forms.FlowLayoutPanel();
             this.pltTeams = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // pltMain
             // 
             this.pltMain.DisplayScale = 0F;
-            this.pltMain.Location = new System.Drawing.Point(61, 50);
+            this.pltMain.Location = new System.Drawing.Point(240, 50);
             this.pltMain.Name = "pltMain";
-            this.pltMain.Size = new System.Drawing.Size(1268, 612);
+            this.pltMain.Size = new System.Drawing.Size(1080, 650);
             this.pltMain.TabIndex = 0;
             this.pltMain.Load += new System.EventHandler(this.pltMain_Load);
             // 
             // btnImport
             // 
-            this.btnImport.Location = new System.Drawing.Point(12, 12);
+            this.btnImport.Location = new System.Drawing.Point(113, 12);
             this.btnImport.Name = "btnImport";
             this.btnImport.Size = new System.Drawing.Size(75, 23);
             this.btnImport.TabIndex = 1;
@@ -55,20 +57,45 @@ namespace Plot_Those_Lines
             // 
             // txtTitle
             // 
-            this.txtTitle.Location = new System.Drawing.Point(93, 14);
+            this.txtTitle.Location = new System.Drawing.Point(207, 14);
             this.txtTitle.Name = "txtTitle";
-            this.txtTitle.Size = new System.Drawing.Size(120, 20);
+            this.txtTitle.Size = new System.Drawing.Size(200, 20);
             this.txtTitle.TabIndex = 3;
             this.txtTitle.TextChanged += new System.EventHandler(this.txtTitle_TextChanged);
+            // 
+            // chkShowData
+            // 
+            this.chkShowData.AutoSize = true;
+            this.chkShowData.Checked = true;
+            this.chkShowData.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowData.Location = new System.Drawing.Point(12, 16);
+            this.chkShowData.Name = "chkShowData";
+            this.chkShowData.Size = new System.Drawing.Size(77, 17);
+            this.chkShowData.TabIndex = 5;
+            this.chkShowData.Text = "Show data";
+            this.chkShowData.UseVisualStyleBackColor = true;
+            this.chkShowData.CheckedChanged += new System.EventHandler(this.chkShowData_CheckedChanged);
+            // 
+            // flpSeries
+            // 
+            this.flpSeries.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.flpSeries.AutoScroll = true;
+            this.flpSeries.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flpSeries.Location = new System.Drawing.Point(12, 50);
+            this.flpSeries.Name = "flpSeries";
+            this.flpSeries.Size = new System.Drawing.Size(124, 702);
+            this.flpSeries.TabIndex = 6;
+            this.flpSeries.WrapContents = false;
             // 
             // pltTeams
             // 
             this.pltTeams.AutoSize = true;
-            this.pltTeams.Location = new System.Drawing.Point(-1, 71);
+            this.pltTeams.Location = new System.Drawing.Point(142, 50);
             this.pltTeams.Name = "pltTeams";
-            this.pltTeams.Size = new System.Drawing.Size(35, 13);
+            this.pltTeams.Size = new System.Drawing.Size(78, 13);
             this.pltTeams.TabIndex = 4;
-            this.pltTeams.Text = "label1";
+            this.pltTeams.Text = "Select a point..";
             this.pltTeams.Click += new System.EventHandler(this.pltTeams_Click);
             // 
             // PlotForm
@@ -79,6 +106,8 @@ namespace Plot_Those_Lines
             this.Controls.Add(this.pltTeams);
             this.Controls.Add(this.txtTitle);
             this.Controls.Add(this.btnImport);
+            this.Controls.Add(this.chkShowData);
+            this.Controls.Add(this.flpSeries);
             this.Controls.Add(this.pltMain);
             this.Name = "PlotForm";
             this.Text = "PlotForm";
@@ -94,5 +123,7 @@ namespace Plot_Those_Lines
         private System.Windows.Forms.Button btnImport;
         private System.Windows.Forms.TextBox txtTitle;
         private System.Windows.Forms.Label pltTeams;
+        private System.Windows.Forms.CheckBox chkShowData;
+    private System.Windows.Forms.FlowLayoutPanel flpSeries;
     }
 }
