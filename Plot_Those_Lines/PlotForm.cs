@@ -1,4 +1,4 @@
-﻿using CsvHelper;
+using CsvHelper;
 using CsvHelper.Configuration;
 using ScottPlot;
 using ScottPlot.Palettes;
@@ -145,6 +145,11 @@ namespace Plot_Those_Lines
             //dont remove future me it will do terrible things c# will not be happy
             txtTitle.Text = "Enter your title here...";
         }
+            private void PlotForm_Load(object sender, EventArgs e)
+            {
+                //dont remove future me it will do terrible things c# will not be happy
+                txtTitle.Text = "Enter your title here...";
+            }
 
     private void btnImport_Click(object sender, EventArgs e)
         {
@@ -239,8 +244,7 @@ namespace Plot_Those_Lines
                 .Select(item =>
                 {
                     //calcule distance en pixels entre souris et point
-                    var pointPixel = pltMain.Plot.GetPixel(new ScottPlot.Coordinates(series.XValues[i], series.YValues[i]));
-
+                    var pointPixel = pltMain.Plot.GetPixel(new ScottPlot.Coordinates(item.x, item.y));
                     //calcule difference avec pythogore
                     double diffx = pointPixel.X - mouse.X;
                     double diffy = pointPixel.Y - mouse.Y;
@@ -276,9 +280,9 @@ namespace Plot_Those_Lines
             var teams = allSeriesData
                 .Where(series => series.XValues
                     .Select((x, i) => new { x, y = series.YValues[i] })
-                    .Any(p => !double.IsNaN(p.x) && !double.IsNaN(p.y) &&
-                              Math.Abs(p.x - matchedX) < tolerance &&
-                              Math.Abs(p.y - matchedY) < tolerance))
+                .Any(p => !double.IsNaN(p.x) && !double.IsNaN(p.y) &&
+                          Math.Abs(p.x - matchedX) < tolerance &&
+                          Math.Abs(p.y - matchedY) < tolerance))
                 .Select(s => s.Name)
                 .Distinct()
                 .ToList();

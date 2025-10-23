@@ -1,4 +1,4 @@
-﻿namespace Plot_Those_Lines
+namespace Plot_Those_Lines
 {
     partial class PlotForm
     {
@@ -82,7 +82,7 @@
             this.Controls.Add(this.pltMain);
             this.Name = "PlotForm";
             this.Text = "PlotForm";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.PlotForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -96,4 +96,3 @@
         private System.Windows.Forms.Label pltTeams;
     }
 }
-
