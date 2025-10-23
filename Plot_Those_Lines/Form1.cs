@@ -231,15 +231,13 @@ namespace Plot_Those_Lines
 
             //TODO: CONVERT TO LINQ
             //parcours toutes les series
-            foreach (var series in allSeriesData)
-            {
-                for (int i = 0; i < series.XValues.Length; i++)
+            // Flatten series into (series, x, y) tuples, skip invalid points, compute pixel distance,
+            // filter to points within 50 px and take the closest one.
+            var nearest = allSeriesData
+                .SelectMany(series => series.XValues.Select((x, i) => new { series, x, y = series.YValues[i] }))
+                .Where(item => !double.IsNaN(item.x) && !double.IsNaN(item.y)) //skip points invalides --theoriquement pas besoin par ce que c'est check
+                .Select(item =>
                 {
-                    //skip points invalides --theoriquement pas besoin par ce que c'est check
-                    //a l'import mais l'import ne check pas les valeurs negatives TODO fix eventuellement
-                    if (double.IsNaN(series.XValues[i]) || double.IsNaN(series.YValues[i]))
-                        continue;
-
                     //calcule distance en pixels entre souris et point
                     var pointPixel = pltMain.Plot.GetPixel(new ScottPlot.Coordinates(series.XValues[i], series.YValues[i]));
 
@@ -247,15 +245,17 @@ namespace Plot_Those_Lines
                     double diffx = pointPixel.X - mouse.X;
                     double diffy = pointPixel.Y - mouse.Y;
                     double distance = Math.Sqrt(diffx * diffx + diffy * diffy);
+                    return new { item.series, item.x, item.y, distance };
+                })
+                .Where(t => t.distance < 50) //si ce point est plus proche et dans les 50 pixels
+                .OrderBy(t => t.distance)
+                .FirstOrDefault();
 
-                    //si ce point est plus proche et dans les 50 pixels
-                    if (distance < minDistance && distance < 50)
-                    {
-                        minDistance = distance;
-                        matchedX = series.XValues[i];
-                        matchedY = series.YValues[i];
-                    }
-                }
+            if (nearest != null)
+            {
+                minDistance = nearest.distance;
+                matchedX = nearest.x;
+                matchedY = nearest.y;
             }
 
             //affiche tooltip ou titre normal
@@ -270,24 +270,20 @@ namespace Plot_Those_Lines
             hoveredTeams.Clear();
             double tolerance = 1e-6; //nesseaire par ce que 1.00001 != 1, donc comme ca c'est accurate a 1 millionth 
 
-            foreach (var series in allSeriesData)
-            {
-                for (int i = 0; i < series.XValues.Length; i++)
-                {
-                    if (double.IsNaN(series.XValues[i]) || double.IsNaN(series.YValues[i]))
-                        continue;
+            // Find all series that contain a point matching matchedX/matchedY within tolerance
+            //prend valeur absolue avec tolerance 
+            // 1.01 != 1 (25mins de debug pour ca)
+            var teams = allSeriesData
+                .Where(series => series.XValues
+                    .Select((x, i) => new { x, y = series.YValues[i] })
+                    .Any(p => !double.IsNaN(p.x) && !double.IsNaN(p.y) &&
+                              Math.Abs(p.x - matchedX) < tolerance &&
+                              Math.Abs(p.y - matchedY) < tolerance))
+                .Select(s => s.Name)
+                .Distinct()
+                .ToList();
 
-                    if (Math.Abs(series.XValues[i] - matchedX) < tolerance &&
-                        Math.Abs(series.YValues[i] - matchedY) < tolerance)
-                        //prend valeur absolue avec tolerance 
-                        // 1.01 != 1 (25mins de debug pour ca)
-                    {
-                        if (!hoveredTeams.Contains(series.Name))
-                            hoveredTeams.Add(series.Name);
-                    }
-                }
-            }
-            //TODO: CONVERT TO LINQ
+            hoveredTeams.AddRange(teams);
 
             if (hoveredTeams.Count > 0)
             {
