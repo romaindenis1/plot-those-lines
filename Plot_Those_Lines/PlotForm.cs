@@ -25,171 +25,81 @@ namespace Plot_Those_Lines
     */
     public partial class PlotForm : Form
     {
-        //va directement sur la bonne directory
-        //au lieu de devoire faire C:/Documents/GitHub..etc
-        private string csvFilePath = Path.Combine(Application.StartupPath, "data.csv");
+        //modele memoire pour series
+        private List<SeriesData> allSeriesData = new List<SeriesData>();
 
-        //classe pour stocker les donnees de chaque serie pour le hover
+        //plottables scatter traces
+        private List<ScottPlot.Plottables.Scatter> courbesGlobal = new List<ScottPlot.Plottables.Scatter>();
+
+        //map nomserie -> couleur
+        private Dictionary<string, System.Drawing.Color> seriesColors = new Dictionary<string, System.Drawing.Color>(StringComparer.OrdinalIgnoreCase);
+
+        //palette hex sans #
+        private List<string> palette = new List<string> { "1f77b4", "ff7f0e", "2ca02c", "d62728", "9467bd", "8c564b", "e377c2", "7f7f7f", "bcbd22", "17becf" };
+
+        //etat ui controle
+        private bool suppressCheckboxEvents = false;
+
+        //chemin csv defaut utilise par l application
+        private string csvFilePath = System.IO.Path.Combine(Application.StartupPath, "data.csv");
+
+        //conteneur simple pour series
         private class SeriesData
         {
             public string Name { get; set; }
             public double[] XValues { get; set; }
             public double[] YValues { get; set; }
         }
-        //liste qui garde toutes les donnees pour detection hover
-        private List<SeriesData> allSeriesData = new List<SeriesData>();
-
-    // liste des scatters courants (une par serie)
-    private List<ScottPlot.Plottables.Scatter> courbesGlobal = new List<ScottPlot.Plottables.Scatter>();
-    // quand on change les cases par code, desactive les handlers
-    private bool suppressCheckboxEvents = false;
-
-    // palette de couleurs pour les series
-        private readonly List<string> palette = new List<string> {
-            "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
-            "#800000", "#008000", "#000080", "#808000", "#800080", "#008080",
-            "#FFA500", "#A52A2A", "#5F9EA0", "#D2691E", "#FF7F50", "#6495ED",
-            "#DC143C", "#00CED1", "#9400D3", "#FF1493", "#00BFFF", "#228B22",
-            "#8B4513", "#2E8B57", "#FF4500", "#DA70D6", "#7FFF00", "#4169E1"
-        };
-
-    // map nom serie -> couleur pour la liste
-    private readonly Dictionary<string, System.Drawing.Color> seriesColors = new Dictionary<string, System.Drawing.Color>(StringComparer.OrdinalIgnoreCase);
 
         public PlotForm()
         {
             InitializeComponent();
-
-            //charge le CSV initial s'il existe
-            if (File.Exists(csvFilePath))
-                LoadCsvAndPlot(csvFilePath);
-            else
-                MessageBox.Show("Le fichier data.csv n'existe pas.");
-
-            //event pour detecter le hover sur les points
-            pltMain.MouseMove += FormsPlot1_MouseMove;
         }
 
         private void LoadCsvAndPlot(string path)
         {
             try
             {
-                //StreamReader = classe derive de TextReader
-                using (var reader = new StreamReader(path))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                //lire csv en annees plus dictionnaire de donnees
+                var (newYears, newData) = ReadCsvData(path);
+
+                if (newYears.Length == 0)
+                    return;
+
+                //si on a deja des donnees decider fusion ou remplacement selon schema annees
+                if (allSeriesData != null && allSeriesData.Count > 0)
                 {
-                    //CultureInfo.InvariantCulture pour format universel 
-                    csv.Read();
-                    csv.ReadHeader();
-                    var headers = csv.HeaderRecord;
+                        //recuperer noms series et annees existantes via linq
+                    var existingNames = allSeriesData.Select(s => s.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    var newNames = newData.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    var existingYears = allSeriesData.SelectMany(s => s.XValues).Distinct().ToArray();
 
-                    var years = new List<double>();
-                    var data = new Dictionary<string, List<double>>();
+                    bool sameSchema = existingNames.SetEquals(newNames);
+                    bool yearsOverlap = existingYears.Intersect(newYears).Any();
 
-                    //Skip(1) par ce que la premiere collone sont les années
-                    headers.Skip(1).ToList().ForEach(header => data[header] = new List<double>());
-
-                    while (csv.Read())
+                    if (!sameSchema || yearsOverlap)
                     {
-                        double yearVal;
-                        if (double.TryParse(csv.GetField(headers[0]), out yearVal))
-                        {
-                            years.Add(yearVal);
-                        }
-                        else
-                        {
-                            years.Add(double.NaN);
-                        }
-
-                        // met les donnees dans le dictionnaire
-                        data.Keys.ToList().
-                            ForEach(pos => data[pos].Add(double.TryParse(csv.GetField(pos), out var val)
-                            ? val : double.NaN));
+                        //donnees entrantes en conflit remplacer precedent dataset silencieusement
+                        ResetData();
+                        var dataX = newYears;
+                        allSeriesData = newData.Select(kv => new SeriesData { Name = kv.Key, XValues = dataX, YValues = kv.Value }).ToList();
                     }
-
-                    // mettre la liste en tableau
-                    double[] dataX = years.ToArray();
-
-                    // efface le graphe precedent
-                    pltMain.Plot.Clear();
-                    allSeriesData.Clear();
-
-                    // stocke les series dans allSeriesData pour hover et toggle
-                    data.Select((key, idx) => new { Key = key.Key, Values = key.Value.ToArray(), Index = idx })
-                        .ToList()
-                        .ForEach(entry =>
-                        {
-                            allSeriesData.Add(new SeriesData
-                            {
-                                Name = entry.Key,
-                                XValues = dataX,
-                                YValues = entry.Values
-                            });
-                        });
-
-                    // creer checkboxes dynamiques et courbes scottplot
-                    if (flpSeries != null)
+                    else
                     {
-                        flpSeries.Controls.Clear();
+                        //meme schema et pas de recoupement -> fusionner
+                        MergeIntoAllSeriesData(newYears, newData);
                     }
-
-                    // vide les courbes existantes
-                    pltMain.Plot.Clear();
-                    courbesGlobal.Clear();
-
-                    for (int i = 0; i < allSeriesData.Count; i++)
-                    {
-                        var s = allSeriesData[i];
-                        var hex = palette[i % palette.Count];
-                        var color = ParseHexColor(hex);
-                        seriesColors[s.Name] = color;
-
-                        // ajoute la courbe au graphe
-                        var scatter = pltMain.Plot.Add.Scatter(s.XValues, s.YValues);
-                        scatter.Color = ScottPlot.Color.FromColor(System.Drawing.Color.FromArgb(color.R, color.G, color.B));
-                        scatter.LineWidth = 2;
-                        scatter.MarkerSize = 0;
-                        scatter.LegendText = s.Name;
-                        courbesGlobal.Add(scatter);
-
-                        // creer la checkbox pour cette serie
-                        if (flpSeries != null)
-                        {
-                            var cb = new CheckBox();
-                            cb.AutoSize = true;
-                            cb.Text = s.Name;
-                            cb.Checked = true;
-                            cb.ForeColor = color;
-                            cb.Margin = new Padding(3, 3, 3, 3);
-                            int idx = i; // capture
-                            cb.CheckedChanged += (sender, e) =>
-                            {
-                                if (suppressCheckboxEvents) return;
-                                if (idx >= 0 && idx < courbesGlobal.Count)
-                                {
-                                    courbesGlobal[idx].IsVisible = cb.Checked;
-                                    pltMain.Refresh();
-                                }
-                            };
-                            flpSeries.Controls.Add(cb);
-                        }
-                    }
-
-                    // finalise le graphe
-                    pltMain.Plot.Title("Plot");
-                    pltMain.Refresh();
-
-                    // dessine selon les cases cochees
-                    RenderPlots();
-
-                    // todo: recuperer ces labels depuis le csv
-                    pltMain.Plot.XLabel("Year");
-                    pltMain.Plot.YLabel("Wins");
-
-                    pltMain.Plot.Legend.IsVisible = false;
-
-                    pltMain.Refresh();
                 }
+                else
+                {
+                    //initialiser allseriesdata depuis newdata
+                        allSeriesData.Clear();
+                    double[] dataX = newYears;
+                    allSeriesData = newData.Select(kv => new SeriesData { Name = kv.Key, XValues = dataX, YValues = kv.Value }).ToList();
+                }
+
+                //rafraichir graphe et ui depuis allseriesdata
+                UpdatePlotAndUI();
             }
             catch (Exception ex)
             {
@@ -197,11 +107,154 @@ namespace Plot_Those_Lines
             }
         }
 
+    //lire csv retourner annees tableau dictionnaire nom->yvalues
+    private (double[] years, Dictionary<string, double[]> data) ReadCsvData(string path)
+        {
+            var years = new List<double>();
+            var data = new Dictionary<string, List<double>>();
 
-            private void PlotForm_Load(object sender, EventArgs e)
+            using (var reader = new StreamReader(path))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                txtTitle.Text = "Enter your title here...";
+                csv.Read();
+                csv.ReadHeader();
+                var headers = csv.HeaderRecord;
+
+                //preparer listes pour chaque colonne entete sauf premiere annee
+                data = headers.Skip(1).ToDictionary(h => h, h => new List<double>());
+
+                while (csv.Read())
+                {
+                    if (!double.TryParse(csv.GetField(headers[0]), out var yearVal))
+                    {
+                        years.Add(double.NaN);
+                    }
+                    else
+                    {
+                        years.Add(yearVal);
+                    }
+
+                    data.Keys.ToList().ForEach(key =>
+                    {
+                        var field = csv.GetField(key);
+                        if (double.TryParse(field, NumberStyles.Float, CultureInfo.InvariantCulture, out var v))
+                            data[key].Add(v);
+                        else
+                            data[key].Add(double.NaN);
+                    });
+                }
             }
+
+            return (years.ToArray(), data.ToDictionary(kv => kv.Key, kv => kv.Value.ToArray()));
+        }
+
+    //fusionner csv entrant dans allseriesdata aligner par annee
+    private void MergeIntoAllSeriesData(double[] newYears, Dictionary<string, double[]> newData)
+        {
+            //construire union des annees
+            var existingYears = allSeriesData.SelectMany(s => s.XValues).Distinct().ToList();
+            var unionYears = existingYears.Union(newYears).Distinct().OrderBy(y => y).ToArray();
+
+            //construire map a partir des entrees existantes et nouvelles en une seule passe
+            var existingEntries = allSeriesData
+                .SelectMany(s => s.XValues.Select((x, i) => new { y = x, name = s.Name, val = s.YValues[i] }));
+
+            var newEntries = newData
+                .SelectMany(kv => kv.Value.Select((v, i) => new { y = (i < newYears.Length ? newYears[i] : double.NaN), name = kv.Key, val = v }));
+
+            var entries = existingEntries.Concat(newEntries)
+                .Where(e => !double.IsNaN(e.y));
+
+            var map = entries
+                .GroupBy(e => e.y)
+                .ToDictionary(g => g.Key, g => g.ToDictionary(a => a.name, a => a.val, StringComparer.OrdinalIgnoreCase));
+
+            //reconstruire allseriesdata pour uniondesannees collecter valeurs par serie nan si manquant
+            var seriesNames = map.Values.SelectMany(d => d.Keys).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+            var newSeriesList = seriesNames
+                .Select(name => new SeriesData
+                {
+                    Name = name,
+                    XValues = unionYears,
+                    YValues = unionYears.Select(year => map.TryGetValue(year, out var dict) && dict.TryGetValue(name, out var v) ? v : double.NaN).ToArray()
+                })
+                .ToList();
+
+            allSeriesData = newSeriesList;
+        }
+
+    //reconstruire graphe et controles ui depuis allseriesdata
+    private void UpdatePlotAndUI()
+        {
+            if (flpSeries != null) flpSeries.Controls.Clear();
+            pltMain.Plot.Clear();
+            courbesGlobal.Clear();
+
+            allSeriesData
+                .Select((s, i) => new { s, i })
+                .ToList()
+                .ForEach(item =>
+                {
+                    var s = item.s;
+                    var i = item.i;
+                    var hex = palette[i % palette.Count];
+                    var color = ParseHexColor(hex);
+                    seriesColors[s.Name] = color;
+
+                    var scatter = pltMain.Plot.Add.Scatter(s.XValues, s.YValues);
+                    scatter.Color = ScottPlot.Color.FromColor(System.Drawing.Color.FromArgb(color.R, color.G, color.B));
+                    scatter.LineWidth = 2;
+                    scatter.MarkerSize = 0;
+                    scatter.LegendText = s.Name;
+                    courbesGlobal.Add(scatter);
+
+                    if (flpSeries != null)
+                    {
+                        //ajoute courbe au graphe et creer checkbox
+                        var cb = new CheckBox();
+                        cb.AutoSize = true;
+                        cb.Text = s.Name;
+                        cb.Checked = true;
+                        cb.ForeColor = color;
+                        cb.Margin = new Padding(3, 3, 3, 3);
+                        int idx = i;
+                        cb.CheckedChanged += (sender, e) =>
+                        {
+                            if (suppressCheckboxEvents) return;
+                            if (idx >= 0 && idx < courbesGlobal.Count)
+                            {
+                                courbesGlobal[idx].IsVisible = cb.Checked;
+                                pltMain.Refresh();
+                            }
+                        };
+                        flpSeries.Controls.Add(cb);
+                    }
+                });
+
+            //finalise graphe
+            pltMain.Plot.Title("plot");
+            pltMain.Plot.XLabel("Year");
+            pltMain.Plot.YLabel("Wins");
+            pltMain.Plot.Legend.IsVisible = false;
+            pltMain.Refresh();
+        }
+
+        private void PlotForm_Load(object sender, EventArgs e)
+        {
+            //initialiser titre par defaut
+            txtTitle.Text = "Enter your title here...";
+
+            //si un data.csv existe au demarrage charger et afficher
+            try
+            {
+                if (File.Exists(csvFilePath))
+                    LoadCsvAndPlot(csvFilePath);
+            }
+            catch
+            {
+            }
+        }
 
     private void btnImport_Click(object sender, EventArgs e)
         {
@@ -216,7 +269,7 @@ namespace Plot_Those_Lines
                 {
                     string selectedFile = openFileDialog.FileName;
 
-                    //Si le fichier existe, compare les 2
+                    //si le fichier existe compare les 2
                     if (File.Exists(csvFilePath) && FileCompare(selectedFile, csvFilePath))
                     {
                         MessageBox.Show("The selected file is identical to the existing data", "Error - Duplicate file", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -244,14 +297,14 @@ namespace Plot_Those_Lines
             using (FileStream fs1 = new FileStream(file1, FileMode.Open))
             using (FileStream fs2 = new FileStream(file2, FileMode.Open))
             {
-                //if not same length -- cannot be the same file
+                //si pas meme longueur -- pas le meme fichier
                 if (fs1.Length != fs2.Length)
                     return false;
 
                 int file1byte;
                 int file2byte;
 
-                //reads bytes of each until finished or mismatch
+                //lit octets jusqu a fin ou mismatch
                 do
                 {
                     file1byte = fs1.ReadByte();
@@ -259,7 +312,7 @@ namespace Plot_Those_Lines
                 }
                 while ((file1byte == file2byte) && (file1byte != -1));
 
-                //return bool
+                //retourne bool
                 return (file1byte == file2byte);
             }
         }
@@ -276,20 +329,20 @@ namespace Plot_Those_Lines
             pltMain.Refresh();
         }
 
-        // Render all series to the plot if chkShowData is checked
-        private void RenderPlots()
+    //render toutes series vers graphe si chkshowdata coche
+    private void RenderPlots()
         {
-            // use the existing scatters in courbesGlobal and the checkboxes in flpSeries
+            //utiliser scatters existants dans courbesglobal et checkboxes dans flpseries
             if (chkShowData == null || !chkShowData.Checked)
             {
-                // hide all
-                foreach (var c in courbesGlobal) c.IsVisible = false;
+                //cacher tout
+                courbesGlobal.ForEach(c => c.IsVisible = false);
                 pltMain.Refresh();
                 return;
             }
 
-            // for each checkbox in flpSeries, toggle the corresponding scatter visibility
-            for (int i = 0; i < courbesGlobal.Count; i++)
+            //pour chaque checkbox dans flpseries basculer visibilite scatter correspondant
+            Enumerable.Range(0, courbesGlobal.Count).ToList().ForEach(i =>
             {
                 var scatter = courbesGlobal[i];
                 bool visible = true;
@@ -299,32 +352,28 @@ namespace Plot_Those_Lines
                         visible = cb.Checked;
                 }
                 scatter.IsVisible = visible;
-            }
+            });
 
             pltMain.Refresh();
         }
 
         private void chkShowData_CheckedChanged(object sender, EventArgs e)
         {
-            // When the global toggle is changed, check/uncheck all series checkboxes
+            //quand toggle global change cocher/decocher toutes les checkboxes series
             if (flpSeries != null)
             {
                 suppressCheckboxEvents = true;
                 bool newState = chkShowData.Checked;
-                foreach (Control c in flpSeries.Controls)
-                {
-                    if (c is CheckBox cb)
-                        cb.Checked = newState;
-                }
+                flpSeries.Controls.OfType<CheckBox>().ToList().ForEach(cb => cb.Checked = newState);
                 suppressCheckboxEvents = false;
             }
 
-            // Now update visibility in one go
+            //mettre a jour visibilite en une fois
             RenderPlots();
         }
 
-        // parse #RRGGBB or RRGGBB into a Color; fallback to Black on error
-        private System.Drawing.Color ParseHexColor(string hex)
+    //parsing hex rrggbb en couleur fallback noir en cas d erreur
+    private System.Drawing.Color ParseHexColor(string hex)
         {
             if (string.IsNullOrWhiteSpace(hex)) return System.Drawing.Color.Black;
             hex = hex.Trim();
@@ -342,8 +391,52 @@ namespace Plot_Those_Lines
                 return System.Drawing.Color.Black;
             }
         }
-        //trouve et affiche le point le plus proche de la souris
-        //ultra consomateur de memoire
+
+    //clear toutes les donnees chargees graphe et controles ui pour remplacer proprement
+    private void ResetData()
+        {
+            try
+            {
+                //reinitialiser modele memoire des series
+                if (allSeriesData == null)
+                    allSeriesData = new List<SeriesData>();
+                else
+                    allSeriesData.Clear();
+
+                //effacer series tracees
+                if (courbesGlobal != null)
+                    courbesGlobal.Clear();
+
+                //effacer couleurs stockees
+                if (seriesColors != null)
+                    seriesColors.Clear();
+
+                //effacer liste ui des series
+                if (flpSeries != null)
+                    flpSeries.Controls.Clear();
+
+                //effacer le graphe
+                if (pltMain != null)
+                {
+                    pltMain.Plot.Clear();
+                    pltMain.Refresh();
+                }
+
+                //assurer etat coherant checkbox globale
+                if (chkShowData != null)
+                {
+                    suppressCheckboxEvents = true;
+                    chkShowData.Checked = true;
+                    suppressCheckboxEvents = false;
+                }
+            }
+            catch
+            {
+                //defensif ne pas planter ui si reset echoue
+            }
+        }
+    //trouve et affiche le point le plus proche de la souris
+    //ultra consomateur de memoire
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs mouse)
         {
             var mouseCoord = pltMain.Plot.GetCoordinates(mouse.X, mouse.Y);
