@@ -116,6 +116,8 @@ Dans cette maquette, on cherche a montrer que en utilisant la boite de texte, on
 ---
 
 ## Conclusion / Bilan
+
+- J'ai beaucoup aime la partie de plannification plus realiste a ce que on aura a faire en entreprise
 - Points forts du projet
 - Axes d’amélioration possibles
 - Compétences acquises
