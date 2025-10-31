@@ -54,6 +54,16 @@ namespace Plot_Those_Lines
         public PlotForm()
         {
             InitializeComponent();
+            // Ensure mouse move events are handled even if the designer wiring was removed.
+            // This avoids losing hover functionality when Designer.cs is modified.
+            try
+            {
+                this.pltMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FormsPlot1_MouseMove);
+            }
+            catch
+            {
+                // ignore if pltMain isn't initialized yet during designer operations
+            }
         }
 
         private void LoadCsvAndPlot(string path)
