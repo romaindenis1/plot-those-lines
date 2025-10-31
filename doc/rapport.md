@@ -2,7 +2,7 @@
 
 **Élève :** Romain Denis  
 **Client :** Xavier Carrel  
-**Période :** 29.08.2025 — 09.01.2026
+**Période :** 29.08.2025 — 01.11.2025
 
 ## Description du domaine
 
