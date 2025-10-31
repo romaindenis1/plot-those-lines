@@ -69,7 +69,7 @@ namespace Plot_Those_Lines
                 //si on a deja des donnees decider fusion ou remplacement selon schema annees
                 if (allSeriesData != null && allSeriesData.Count > 0)
                 {
-                        //recuperer noms series et annees existantes via linq
+                    //recuperer noms series et annees existantes via linq
                     var existingNames = allSeriesData.Select(s => s.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
                     var newNames = newData.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
                     var existingYears = allSeriesData.SelectMany(s => s.XValues).Distinct().ToArray();
@@ -93,7 +93,7 @@ namespace Plot_Those_Lines
                 else
                 {
                     //initialiser allseriesdata depuis newdata
-                        allSeriesData.Clear();
+                    allSeriesData.Clear();
                     double[] dataX = newYears;
                     allSeriesData = newData.Select(kv => new SeriesData { Name = kv.Key, XValues = dataX, YValues = kv.Value }).ToList();
                 }
@@ -107,8 +107,8 @@ namespace Plot_Those_Lines
             }
         }
 
-    //lire csv retourner annees tableau dictionnaire nom->yvalues
-    private (double[] years, Dictionary<string, double[]> data) ReadCsvData(string path)
+        //lire csv retourner annees tableau dictionnaire nom->yvalues
+        private (double[] years, Dictionary<string, double[]> data) ReadCsvData(string path)
         {
             var years = new List<double>();
             var data = new Dictionary<string, List<double>>();
@@ -148,8 +148,8 @@ namespace Plot_Those_Lines
             return (years.ToArray(), data.ToDictionary(kv => kv.Key, kv => kv.Value.ToArray()));
         }
 
-    //fusionner csv entrant dans allseriesdata aligner par annee
-    private void MergeIntoAllSeriesData(double[] newYears, Dictionary<string, double[]> newData)
+        //fusionner csv entrant dans allseriesdata aligner par annee
+        private void MergeIntoAllSeriesData(double[] newYears, Dictionary<string, double[]> newData)
         {
             //construire union des annees
             var existingYears = allSeriesData.SelectMany(s => s.XValues).Distinct().ToList();
@@ -184,24 +184,25 @@ namespace Plot_Those_Lines
             allSeriesData = newSeriesList;
         }
 
-    //reconstruire graphe et controles ui depuis allseriesdata
-    private void UpdatePlotAndUI()
+        //reconstruire graphe et controles ui depuis allseriesdata
+        private void UpdatePlotAndUI()
         {
             if (flpSeries != null) flpSeries.Controls.Clear();
             pltMain.Plot.Clear();
             courbesGlobal.Clear();
 
+            //construit graphique
             allSeriesData
                 .Select((s, i) => new { s, i })
                 .ToList()
                 .ForEach(item =>
+                //settings
                 {
                     var s = item.s;
                     var i = item.i;
                     var hex = palette[i % palette.Count];
                     var color = ParseHexColor(hex);
                     seriesColors[s.Name] = color;
-
                     var scatter = pltMain.Plot.Add.Scatter(s.XValues, s.YValues);
                     scatter.Color = ScottPlot.Color.FromColor(System.Drawing.Color.FromArgb(color.R, color.G, color.B));
                     scatter.LineWidth = 2;
@@ -232,11 +233,9 @@ namespace Plot_Those_Lines
                     }
                 });
 
-            //finalise graphe
-            pltMain.Plot.Title("plot");
-            pltMain.Plot.XLabel("Year");
-            pltMain.Plot.YLabel("Wins");
-            pltMain.Plot.Legend.IsVisible = false;
+            pltMain.Plot.XLabel("Year");                //x
+            pltMain.Plot.YLabel("Wins");                //y
+            pltMain.Plot.Legend.IsVisible = false;      //j'utilise pas la legende, mais elle est active de base
             pltMain.Refresh();
         }
 
@@ -256,20 +255,20 @@ namespace Plot_Those_Lines
             }
         }
 
-    private void btnImport_Click(object sender, EventArgs e)
+        //logique pour l'import dun fichier
+        private void btnImport_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.InitialDirectory = @"C:\";
-                openFileDialog.Filter = "CSV files (*.csv)|*.csv";
-                openFileDialog.FilterIndex = 1;
-                openFileDialog.RestoreDirectory = true;
+                openFileDialog.InitialDirectory = @"C:\";           //defini le drive c par default
+                openFileDialog.Filter = "CSV files (*.csv)|*.csv";  //dit de prendre que les fichiers CSV
+                openFileDialog.FilterIndex = 1;                     //dit de prendre la premiere possibility avant (index commence a 1)
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     string selectedFile = openFileDialog.FileName;
 
-                    //si le fichier existe compare les 2
+                    //si les fichiers sont jugees identiques par filecompare
                     if (File.Exists(csvFilePath) && FileCompare(selectedFile, csvFilePath))
                     {
                         MessageBox.Show("The selected file is identical to the existing data", "Error - Duplicate file", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -288,6 +287,7 @@ namespace Plot_Those_Lines
          * Pas mon code, volé de 
          * https://learn.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-file-compare
          */
+        //compare fichier importe avec fichier que le user veux importer
         private bool FileCompare(string file1, string file2)
         {
 
@@ -322,6 +322,7 @@ namespace Plot_Those_Lines
 
         }
 
+        //change le titre scottplot a partir du titre de la textbox
         private void txtTitle_TextChanged(object sender, EventArgs e)
         {
             string insertedTitle = txtTitle.Text;
@@ -329,8 +330,8 @@ namespace Plot_Those_Lines
             pltMain.Refresh();
         }
 
-    //render toutes series vers graphe si chkshowdata coche
-    private void RenderPlots()
+        //render toutes series vers graphe si chkshowdata coche
+        private void RenderPlots()
         {
             //utiliser scatters existants dans courbesglobal et checkboxes dans flpseries
             if (chkShowData == null || !chkShowData.Checked)
@@ -372,13 +373,14 @@ namespace Plot_Those_Lines
             RenderPlots();
         }
 
-    //parsing hex rrggbb en couleur fallback noir en cas d erreur
-    private System.Drawing.Color ParseHexColor(string hex)
+        //parse hex rrggbb en couleur fallback noir en cas d erreur
+        private System.Drawing.Color ParseHexColor(string hex)
         {
             if (string.IsNullOrWhiteSpace(hex)) return System.Drawing.Color.Black;
             hex = hex.Trim();
             if (hex.StartsWith("#")) hex = hex.Substring(1);
             if (hex.Length != 6) return System.Drawing.Color.Black;
+            //return rbg
             try
             {
                 int r = int.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
@@ -392,8 +394,8 @@ namespace Plot_Those_Lines
             }
         }
 
-    //clear toutes les donnees chargees graphe et controles ui pour remplacer proprement
-    private void ResetData()
+        //clear toutes les donnees chargees graphe et controles ui pour remplacer proprement
+        private void ResetData()
         {
             try
             {
@@ -432,11 +434,11 @@ namespace Plot_Those_Lines
             }
             catch
             {
-                //defensif ne pas planter ui si reset echoue
+                //ne pas planter ui si reset echoue
             }
         }
-    //trouve et affiche le point le plus proche de la souris
-    //ultra consomateur de memoire
+        //trouve et affiche le point le plus proche de la souris
+        //ultra consomateur de memoire
         private void FormsPlot1_MouseMove(object sender, MouseEventArgs mouse)
         {
             var mouseCoord = pltMain.Plot.GetCoordinates(mouse.X, mouse.Y);
@@ -446,10 +448,8 @@ namespace Plot_Those_Lines
             double matchedY = double.NaN;
             List<string> hoveredTeams = new List<string>();
 
-            //TODO: CONVERT TO LINQ
-            //parcours toutes les series
-            // Flatten series into (series, x, y) tuples, skip invalid points, compute pixel distance,
-            // filter to points within 50 px and take the closest one.
+            //map series dans des tuples (series, x, y), en sautant points non valide, calcule distance du pixel
+            //filtre sur les points a moins de 50px et prend le plus proche
             var nearest = allSeriesData
                 .SelectMany(series => series.XValues.Select((x, i) => new { series, x, y = series.YValues[i] }))
                 .Where(item => !double.IsNaN(item.x) && !double.IsNaN(item.y)) //skip points invalides --theoriquement pas besoin par ce que c'est check
@@ -482,13 +482,12 @@ namespace Plot_Those_Lines
                 return;
             }
 
-            
+
             hoveredTeams.Clear();
             double tolerance = 1e-6; //nesseaire par ce que 1.00001 != 1, donc comme ca c'est accurate a 1 millionth 
 
-            // Find all series that contain a point matching matchedX/matchedY within tolerance
-            //prend valeur absolue avec tolerance 
-            // 1.01 != 1 (25mins de debug pour ca)
+
+            //trouve toutes series qui corespondent avec matchedy and matchedx prend valeur absolue avec tolerance 
             var teams = allSeriesData
                 .Where(series => series.XValues
                     .Select((x, i) => new { x, y = series.YValues[i] })
@@ -501,6 +500,7 @@ namespace Plot_Those_Lines
 
             hoveredTeams.AddRange(teams);
 
+            //si il y a une equipe survole
             if (hoveredTeams.Count > 0)
             {
                 string hoverText = $"Year: {matchedX:F0}\nValue: {matchedY:F2}\nTeams:\n{string.Join("\n", hoveredTeams)}";
@@ -508,6 +508,7 @@ namespace Plot_Those_Lines
                 //met curseur main par ce que c'est plus beau
                 pltMain.Cursor = Cursors.Hand;
             }
+            //else reset a default
             else
             {
                 pltTeams.Text = "";
@@ -517,7 +518,7 @@ namespace Plot_Those_Lines
 
 
 
-    private void pltTeams_Click(object sender, EventArgs e)
+        private void pltTeams_Click(object sender, EventArgs e)
         {
 
         }
