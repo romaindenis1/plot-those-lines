@@ -65,11 +65,13 @@ Sur `MouseMove`, on obtient la position souris via `GetCoordinates`. On parcourt
 ### Import et doublons
 Le bouton d'import ouvre `OpenFileDialog`. Le fichier sélectionné est comparé au fichier préchargé a `csvFilePath` existant via `FileCompare` (byte par byte). Si différent, on copie le fichier puis on re appelle `LoadCsvAndPlot`. Sinon, on ne charge pas le fichier (par ce que il est identique) et on alerte avec `MessageBox.Show`.
 
+Cette logique garantit la protection contre les imports accidentels et fournit un retour utilisateur clair en cas de problème.
+
 ## Rapport de tests
 
 Tous les tests d'acceptaces ont été vérifiés et sont OK.
 
-| User story | Critères d'acceptation (résumé) | Statut | Lien (issue / user story) |
+| User story | Critères d'acceptation (résumé) | Statut | Lien issue |
 |---|---:|:---:|---|
 | Une ligne par entrée de données | Pour chaque entrée importée, une courbe/ligne est tracée représentant les valeurs | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/1) |
 | Même période pour toutes les séries | Toutes les séries partagent le même axe temporel / même plage X lors de l'affichage | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/1) |
@@ -82,6 +84,9 @@ Tous les tests d'acceptaces ont été vérifiés et sont OK.
 | Restauration du graphique précédent | Après la première utilisation, le graphique précédemment affiché se recharge à l'ouverture suivante | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3) |
 | Import robuste & gestion d'erreurs | Import CSV : données valides importées; en cas d'erreur (type, vide, pas de changement), l'import est rejeté avec message d'erreur explicite | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3) |
 | Pas d'import en double | Si les mêmes données existent déjà, l'import est refusé et l'utilisateur est informé | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3) |
+| Ajout séquentiel des données | Pendant que les données sont tracées, quand les données ont plusieurs séries chronologiques pour une seule entrée, le programme affiche les deux entrées consécutives sur une seule ligne. | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/4) |
+| Toggle des série | Pendant que les données sont affichées, une série de cases à cocher permet de toggle les ensembles de données | OK | [Lien](https://github.com/romaindenis1/plot-those-lines/issues/2) |
+
 
 ## Maquettes
 
@@ -109,7 +114,10 @@ Dans cette maquette, on cherche a montrer que en utilisant la boite de texte, on
 - L'AI a seulement été utilisé pour les taches avec aucune valeure ajouté par humain, par example:
     - Le squelette de rapport
     - Donnés
+    - Transformation de couleurs scottplot en coleurs c#
 - L'AI a acceleré les taches avec aucune valeur ajouté humain, et la lecture de la documentation (surtout la documentation scottplot qui est compliqué)
+- L'AI presente une grande aide pour les taches sans valeur ajouté, et m'a beaucoup facilité certaines taches qui aurait pu prendre des heures. Par example, le fait de separer un fichier CSV en 2 pour pouvoir tester l'ajout de donnes sequencielles m'aurait pris des heures a faire. L'AI l'a fait en 1 minute.
+- Cependant, l'AI est toujours assez nouveau et croissant, il a donc ses limites. Par example, l'ai ne peut pas et n'a pas aidé pour la creation du code. Ceci est du au fait que l'ai ne connais pas le Cahier des Charges, ne connais pas la version de scottplot (la syntax de scottplot a beaucoup changé par version). Donc l'ai est limité dans la progession du code 
 - Réflexion critique sur les avantages et limites
 
 
@@ -117,11 +125,6 @@ Dans cette maquette, on cherche a montrer que en utilisant la boite de texte, on
 
 ## Conclusion / Bilan
 
-- J'ai beaucoup aime la partie de plannification plus realiste a ce que on aura a faire en entreprise
-- Points forts du projet
-- Axes d’amélioration possibles
-- Compétences acquises
-- Perspectives futures
-
+- J'ai beaucoup aime la partie de plannification plus realiste a ce que on aura a faire en entreprise. Meme si elle etait longue, j'ai trouve cette periode tres revelateur envers le futur. Pour la partie de programmation fonctionelle, je pense que cette philosiphie de code est tres utilse, et vaut le coup de apprendre. Tristement, les concepts de programmation fonctionelle sont pas tres adapté aux débutants, et je ne pense pas avoir utilisé le linq a sont potentiel. Je pense que c'est quelque chose a ameliorer dans le futur, je souhaite pouvoir approfondir les lambas et autres dans le futur, idéalement pas avec du C# et l'environement Microsoft. Durant ce projet, j'ai aprris la vrai importance de la pannification et de schemas, ainsi que la philosophie de la programmation fonctionelle. 
 ---
 
