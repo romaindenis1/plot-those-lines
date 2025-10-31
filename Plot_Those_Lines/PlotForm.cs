@@ -35,7 +35,7 @@ namespace Plot_Those_Lines
         private Dictionary<string, System.Drawing.Color> seriesColors = new Dictionary<string, System.Drawing.Color>(StringComparer.OrdinalIgnoreCase);
 
         //palette hex sans #
-        private List<string> palette = new List<string> { "1f77b4", "ff7f0e", "2ca02c", "d62728", "9467bd", "8c564b", "e377c2", "7f7f7f", "bcbd22", "17becf" };
+        private List<string> palette = new List<string> { "1f77b4", "ff7f0e", "2ca02c", "d62728", "9467bd", "8c564b", "e377c2", "7f7f7f", "bcbd22", "17becf", "000000", "000000" };
 
         //etat ui controle
         private bool suppressCheckboxEvents = false;
@@ -54,15 +54,13 @@ namespace Plot_Those_Lines
         public PlotForm()
         {
             InitializeComponent();
-            // Ensure mouse move events are handled even if the designer wiring was removed.
-            // This avoids losing hover functionality when Designer.cs is modified.
+            //ajoute evenement souris pour tooltip, mieux pour eviter erreurs de designer
             try
             {
                 this.pltMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FormsPlot1_MouseMove);
             }
             catch
             {
-                // ignore if pltMain isn't initialized yet during designer operations
             }
         }
 
