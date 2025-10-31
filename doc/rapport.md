@@ -18,11 +18,24 @@ L'interface permet de naviguer dans le temps et d'ajuster le zoom pour explorer 
 - Organiser un projet : user stories, planification, gestion Git et tests d'acceptance.  
 - Traiter des données : parsing, gestion des NaN et comparaisons flottantes (tolérances).
 
+Ces objectifs seront travaillés via ce projet (import/export, parsing) et des livrables (code, rapport).
+
 ## Objectifs produit
 
-- Visualiser des séries depuis CSV/JSON/API.  
-- Comparer plusieurs courbes, tracer des fonctions, afficher légendes et couleurs.  
-- Interactions clés : hover, zoom et export simple.
+Ce projet vise à fournir une interface simple pour analyser des séries de donnés. L'accent est mis sur la facilité d'importation, la comparaison visuelle et des interactions intuitives (survol, masquage, zoom).
+
+Comparer plusieurs courbes, tracer des fonctions, afficher légendes et couleurs.  
+Interactions clés :
+- Import CSV
+- Protection doublons
+- Fusion / Remplacement
+- Tracé séries
+- Hover interactif
+- Toggle séries
+- Zoom fluide
+- Sauvegarde & chargement
+- Gestion Mauvaises donnés
+- Extensibilité
 
 ## Domaine d’application
 
@@ -43,29 +56,25 @@ Les moyens de récupérer ces données seront les suivantes :
 -	https://www.basketball-reference.com/
 -	ChatGPT
 
-**Dates:** 29.08.2025 - 09.01.2026
-
 ## Introduction
 ## Détails techniques
 
 ### Parsing et I/O
-La lecture CSV se fait dans `LoadCsvAndPlot` avec `StreamReader` + `CsvReader`. (`csv.ReadHeader()`) est utilisé pour créer la  `data`. Le chemin par défaut `csvFilePath` (dans `Application.StartupPath`) permet de charger un fichier a l'execution.
+Le fichier CSV est chargé par la méthode `LoadCsvAndPlot` en utilisant `StreamReader` et `CsvReader`. On appelle `csv.ReadHeader()` pour lire l’en-tête et construit (`data`). Par défaut, l’application tente de charger `data.csv` depuis `Application.StartupPath` (variable `csvFilePath`) au démarrage.
 
-Pour chaque ligne, la première colonne est parsée comme X (car la premiere collone est l'année) avec `TryParse`; en cas d'échec on stocke `double.NaN`. Les autres colonnes sont parsées comme Y (car se sont les donnes a mettre sur le graphique) avec `TryParse(csv.GetField(pos), out var val)` et ajoutées aux listes du dictionnaire `data`.
+Pour chaque ligne du fichier, la première colonne est considérée comme l’axe X (c'est l'année) : on essaie de la convertir avec `double.TryParse`. Si la conversion échoue, on enregistre une valeure null. Les autres colonnes sont les valeurs Y (les données des équipes) : chaque champ est parsé via `double.TryParse(csv.GetField(...))` puis ajouté au dictionnaire `data`. Les valeurs manquantes ou non numériques sont stockées comme null afin que le tracé conserve la position temporelle sans afficher de point invalide.
 
 ### Modèle en mémoire
-Les données sont stockées dans `Dictionary<string, List<double>> data` et `List<double> years`. Avant l'affichage, `years` devient `double[] dataX`. Pour l'interaction, chaque série est convertie en `SeriesData { Name, XValues, YValues }` (tableaux) et ajoutée à `List<SeriesData> allSeriesData` pour la lire.
+Les données sont stockées dans `Dictionary<string, List<double>> data` et `List<double> years`. Avant l'affichage, `years` devient `double[] dataX`. Chaque série est convertie en tableau `SeriesData { Name, XValues, YValues }` et ajoutée à `List<SeriesData> allSeriesData` pour la lire.
 
 ### Affichage
-Le affichage utilise ScottPlot : on appelle `formsPlot1.Plot.Add.Scatter(dataX, yValues)` pour chaque série. La couleur est choisie par le tableau `palette`. Les axes et la légende sont activés avec `Plot.XLabel`, `Plot.YLabel` et `Plot.Legend.IsVisible`.
+L'interface utilise ScottPlot pour tracer les séries. Pour chaque série, l'application appelle `pltMain.Plot.Add.Scatter(dataX, yValues)` afin d'ajouter une courbe au graphique. Les couleurs sont choisies depuis la palette (`palette`). Les libellés d'axe et la légende sont configurés via `Plot.XLabel`, `Plot.YLabel` et `Plot.Legend.IsVisible`.
 
 ### Hover
-Sur `MouseMove`, on obtient la position souris via `GetCoordinates`. On parcourt les points, convertit chaque point en pixel (`Plot.GetPixel`) et calcule la distance pour trouver le point le plus proche dans un aire de 50 px. Ensuite un filtre LINQ (`Math.Abs(p.X - matchedX) < tolerance`) identifie toutes les séries contenant ce point. Les noms sont affichés dans `label1`.
+Lors du mouvement de la souris (`MouseMove`), on récupère la position de la souris avec `GetCoordinates`. Le code cherche dans tous les points valides, convertit leurs coordonees en pixels (`Plot.GetPixel`) et calcule la distance en pixels pour repérer le point le plus proche a maximum 50px. Une fois un point trouvé, on recherche toutes les séries qui ont ce meme point et on affiche la date, la valeur et les noms des séries survolées dans le label `pltTeams`. Le curseur change également pour indiquer que un point est trouve.
 
 ### Import et doublons
-Le bouton d'import ouvre `OpenFileDialog`. Le fichier sélectionné est comparé au fichier préchargé a `csvFilePath` existant via `FileCompare` (byte par byte). Si différent, on copie le fichier puis on re appelle `LoadCsvAndPlot`. Sinon, on ne charge pas le fichier (par ce que il est identique) et on alerte avec `MessageBox.Show`.
-
-Cette logique garantit la protection contre les imports accidentels et fournit un retour utilisateur clair en cas de problème.
+Le bouton d'import ouvre une boite de dialogue de classe (`OpenFileDialog`) pour sélectionner un fichier CSV. Le fichier choisi est comparé byte par byte, au fichier deja stocke dans `csvFilePath` avec la fonction `FileCompare`. Si les fichiers sont differents, le fichier est copié dans le répertoire de l'application et `LoadCsvAndPlot` est appelé pour recharger l'ecran et afficher les nouvelles données. Si les fichiers sont identiques, l'import est annulé et l'utilisateur est informé par un `MessageBox.Show`. Cette logique garantit la protection contre les imports accidentels et fournit un retour utilisateur clair en cas de problème.
 
 ## Rapport de tests
 
@@ -117,8 +126,7 @@ Dans cette maquette, on cherche a montrer que en utilisant la boite de texte, on
     - Transformation de couleurs scottplot en coleurs c#
 - L'AI a acceleré les taches avec aucune valeur ajouté humain, et la lecture de la documentation (surtout la documentation scottplot qui est compliqué)
 - L'AI presente une grande aide pour les taches sans valeur ajouté, et m'a beaucoup facilité certaines taches qui aurait pu prendre des heures. Par example, le fait de separer un fichier CSV en 2 pour pouvoir tester l'ajout de donnes sequencielles m'aurait pris des heures a faire. L'AI l'a fait en 1 minute.
-- Cependant, l'AI est toujours assez nouveau et croissant, il a donc ses limites. Par example, l'ai ne peut pas et n'a pas aidé pour la creation du code. Ceci est du au fait que l'ai ne connais pas le Cahier des Charges, ne connais pas la version de scottplot (la syntax de scottplot a beaucoup changé par version). Donc l'ai est limité dans la progession du code 
-- Réflexion critique sur les avantages et limites
+- Cependant, l'AI est toujours assez nouveau et croissant, il a donc ses limites. Par example, l'ai ne peut pas et n'a pas aidé pour la creation du code. Ceci est du au fait que l'ai ne connais pas le Cahier des Charges, ne connais pas la version de scottplot (la syntax de scottplot a beaucoup changé par version). Donc l'ai est limité dans la progession du code.
 
 
 ---
