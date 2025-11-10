@@ -43,14 +43,6 @@ namespace Plot_Those_Lines
         //chemin csv defaut utilise par l application
         private string csvFilePath = System.IO.Path.Combine(Application.StartupPath, "data.csv");
 
-        //conteneur simple pour series
-        private class SeriesData
-        {
-            public string Name { get; set; }
-            public double[] XValues { get; set; }
-            public double[] YValues { get; set; }
-        }
-
         public PlotForm()
         {
             InitializeComponent();
