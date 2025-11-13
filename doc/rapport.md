@@ -109,6 +109,11 @@ Pour cette maquette, on cherche a montrer que il y a un slider pour zoomer et de
 
 Importation de donnes flexible
 ![Stockage Schema](./MaquetteStockage.PNG) 
+La procedure de stockage se déroule comme ceci:
+Premierement, l'utilisateur utilise le boutton importer, et selectionne un fichier. 
+Apres ceci, le programme commence le traitement de donnés. Il commence par regarder si le fichier est un fichier CSV valide, que il ne manque pas de donnés ou d'encapsulation. Apres, le programme regarde si le fichier que l'utilisateur veux importer a les memes collones(x, y) que le fichier que le programme utilise maintenant. Si oui, le programme regarde si il est possible de fussioner les donnes. Si oui, les 2 CSV seront fussioné. Sinon, le fichier remplacera le fichier précedent. 
+Finalement, le programme reprend le nouveau fichier, et pour chaque serie, une ligne est tracé avec une couleure.
+
 ![Maquette Stockage 2](./MaquetteStockage2.png)
 Pour cette maquette, on cherche a montrer qu'il y a un bouton pour importer.
 Dans le schema, on cherche a montrer comment les donnés sont stockés de manières permanentes. Si les donnes sont validés par le programme, le fichier est copié dans le repertoire du programme et ensuite chargé pour etre affiché.
