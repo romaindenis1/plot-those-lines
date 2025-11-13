@@ -57,6 +57,50 @@ Les moyens de récupérer ces données seront les suivantes :
 -	ChatGPT
 
 ## Introduction
+
+## Analyse fonctionelle
+
+### Model - [Lien](https://github.com/romaindenis1/plot-those-lines/issues/7)
+En tant que developpeur, je veux avoir une representation mentale de l'application sous l'issue GitHub.
+
+- Le modele est complet et represente toutes les fonctionnalites de l'application.
+- Il y a un lien dans le depot qui mene au projet.
+
+### Affichage de fonctions mathematiques - [Lien](https://github.com/romaindenis1/plot-those-lines/issues/5)
+En tant qu'utilisateur, je souhaite disposer d'un mode pour afficher des fonctions plutot que des series temporelles.
+
+- Lorsque le programme est en cours d'exécution, si l'utilisateur clique sur la zone de texte "Insert your function" et saisit une fonction mathematique valide, le programme la tracera.
+- Lors de l'importation de données, le programme accepte l'équivalent C# des fonctions mathematiques, notamment (mais pas uniquement) " sin ", " cos " et " ^ ".
+
+### Prise en charge de plusieurs intervalles - [Lien](https://github.com/romaindenis1/plot-those-lines/issues/4)
+En tant qu'utilisateur, je veux afficher plusieurs intervalles temporels pour les memes données.
+
+- Lorsque les données sont tracées, si les données ont plusieurs séries temporelles pour une entrée, le programme affiche les entrées consécutives comme une seule ligne.
+
+### Importation de données flexible - [Lien](https://github.com/romaindenis1/plot-those-lines/issues/3)
+En tant qu'utilisateur, je veux importer des séries de données de faeon permanente. Le programme me permet d'importer un ou plusieurs formats de données.
+
+- Lorsque le programme est ouvert pour la première fois, aucun graphique n'est affiché.
+- Lorsque le programme est ouvert après la première fois, le graphique affiché précédemment est de nouveau affiché.
+- Pendant que l'application fonctionne, lorsque j'importe un fichier CSV, les données sont correctement importées et fonctionnent. Si les données contiennent une erreur (mauvais type de valeur, valeur impossible, valeur vide) ou s'il n'y a aucun changement (dans les en-tetes et les données), le programme n'importe pas les données et indique a l'utilisateur quel type de problème est survenu.
+- Pendant que l'application fonctionne, si j'essaie d'importer des données qui existent déjà, le programme n'importe pas ces données et indique à l'utilisateur que les données existent déja.
+
+### Flexibilité d'affichage - [Lien](https://github.com/romaindenis1/plot-those-lines/issues/2)
+En tant qu'utilisateur, je veux bénéficier d'une grande flexibilité d'affichage afin de pouvoir analyser mes données en détail.
+
+- Pendant que l'application fonctionne, lorsque j'ajuste le zoom en utilisant Ctrl + molette de la souris, l'application fait un zoom conforme à l'entrée.
+- Pendant que l'application fonctionne et que les données sont correctement importées, il y a une échelle sur les axes x et y pour mieux visualiser les données.
+- Pendant que l'application fonctionne et que les données sont correctement importées, un texte représente chaque entrée de données dans la couleur avec laquelle elle est tracée sur le graphique.
+- Lorsque je survole un point donné des données, j'obtiens la valeur exacte de l'entrée pour la date.
+- Lorsqu'une donnée est tracée, en utilisant la zone de texte " Insert your title here... ", l'utilisateur peut entrer un titre et l'afficher.
+- Lorsqu'une donnée est tracée, il y a une série de cases à cocher qui permettent d'activer ou de désactiver certains ensembles de données.
+
+### Représentation graphique - [Lien](https://github.com/romaindenis1/plot-those-lines/issues/1)
+En tant qu'utilisateur, je veux afficher une représentation graphique de plusieurs séries temporelles simultanément.
+
+- Lorsque des données sont insérées dans le programme, une ligne est tracée pour chaque entrée, représentant correctement les données.
+- Lorsque les données sont tracées, la période temporelle de toutes les données est la même.
+
 ## Détails techniques
 
 ### Parsing et I/O
